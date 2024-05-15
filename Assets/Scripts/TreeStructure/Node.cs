@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node
+public struct Node
 {
     Spatial m_Entry;
     int m_Level;
