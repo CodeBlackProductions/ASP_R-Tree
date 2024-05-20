@@ -1,11 +1,8 @@
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
-
-public struct Rect
-{
-    public Vector3 lowerLeft;
-    public Vector3 upperRight;
-}
 
 public class RTree
 {
@@ -13,7 +10,7 @@ public class RTree
     private int m_Depth;
     private int m_NodeCapacity;
 
-    private Dictionary<int, GameObject> m_GameObjects;
+    private List<GameObject> m_GameObjects;
 
     public RTree(Node _Root, int _NodeCapacity)
     {
@@ -24,8 +21,29 @@ public class RTree
 
     #region External Access
 
-    public void Insert(LeafData _Data)
+    public void Insert(GameObject _Data)
     {
+        m_GameObjects.Add(_Data);
+        Vector3 pos = _Data.transform.position;
+
+        if (m_Root.Entry == null)
+        {
+            Rect rect = new Rect(LL,UR);
+            LeafData[] leafData = new LeafData[] {new LeafData(m_GameObjects.Count, pos.x, pos.y, pos.z)};
+            m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity) ;
+            return;
+        }
+
+        //return added values?
+        Inserter.InsertData(m_GameObjects.Count, pos.x, pos.y, pos.z);
+
+        if (m_Root.IsOverflowing())
+        {
+            Rect rect = new Rect(LL, UR);
+            Node newRoot = new Node(m_Depth + 1, new Branch(new Node(), rect, new Node[] {m_Root}, m_NodeCapacity));
+            SplitNode(newRoot);
+            m_Root = newRoot;
+        }
     }
 
     public void Remove(GameObject _Obj)

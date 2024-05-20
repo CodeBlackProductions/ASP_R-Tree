@@ -27,9 +27,9 @@ public class ParallelSearch
         {
             throw new InvalidOperationException("Empty Node while scanning R-Tree: " + _Root);
         }
-        if (_Range.lowerLeft.x > _Range.upperRight.x || _Range.lowerLeft.y > _Range.upperRight.y)
+        if (_Range.LowerLeft.x > _Range.UpperRight.x || _Range.LowerLeft.y > _Range.UpperRight.y)
         {
-            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.lowerLeft.x + " | " + _Range.lowerLeft.y + " - " + _Range.upperRight.x + " | " + _Range.upperRight.y);
+            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.x + " | " + _Range.LowerLeft.y + " - " + _Range.UpperRight.x + " | " + _Range.UpperRight.y);
         }
 
         NativeArray<Node> nodes;
@@ -129,9 +129,9 @@ public class ParallelSearch
 
     private static bool Intersects(Rect A, Rect B)
     {
-        return !(A.upperRight.x < B.lowerLeft.x ||
-                 B.upperRight.x < A.lowerLeft.x ||
-                 A.upperRight.y < B.lowerLeft.y ||
-                 B.upperRight.y < A.lowerLeft.y);
+        return !(A.UpperRight.x < B.LowerLeft.x ||
+                 B.UpperRight.x < A.LowerLeft.x ||
+                 A.UpperRight.y < B.LowerLeft.y ||
+                 B.UpperRight.y < A.LowerLeft.y);
     }
 }
