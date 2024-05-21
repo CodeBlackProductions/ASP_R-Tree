@@ -66,7 +66,7 @@ public class ParallelSearch
             nodes = nodes
         };
 
-        JobHandle jobHandle = searchJob.Schedule(nodes.Length, 64); // Adjust batch size (64) as needed
+        JobHandle jobHandle = searchJob.Schedule(nodes.Length, 64);
 
         jobHandle.Complete();
 
