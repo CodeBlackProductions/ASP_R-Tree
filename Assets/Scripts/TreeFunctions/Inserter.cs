@@ -1,9 +1,9 @@
 using System;
+using UnityEngine;
 
 public class Inserter
 {
-    // return int to return the number of added nodes? maybe two values to return added levels and nodes?
-    public static int InsertData(Node _Root, int _ObjIDX, float _PosX, float _PosY, float _PosZ)
+    public static void InsertData(Node _Root, int _ObjIDX, float _PosX, float _PosY, float _PosZ)
     {
         LeafData insertData = new LeafData(_ObjIDX, _PosX, _PosY, _PosZ);
 
@@ -18,21 +18,15 @@ public class Inserter
         {
             InsertIntoLeaf(targetNode, leaf, insertData);
         }
-        else if (targetNode.Entry is Branch branch)
-        {
-            InsertIntoBranch(targetNode, branch, insertData);
-        }
         else
         {
             throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
         }
 
-        RebalanceTree(_Root);
-
-        return ???;
+        TreeBalancer.RebalanceTree(_Root);
     }
 
-    private static int InsertIntoLeaf(Node _LeafNode, Leaf _Leaf, LeafData _InsertData)
+    private static void InsertIntoLeaf(Node _LeafNode, Leaf _Leaf, LeafData _InsertData)
     {
         LeafData[] oldData = _Leaf.Data;
         LeafData[] newData = new LeafData[oldData.Length + 1];
@@ -42,45 +36,31 @@ public class Inserter
 
         _Leaf.Data = newData;
 
+        Rect rect = UpdateRect(_LeafNode, _InsertData);
+        _Leaf.Rect = rect;
+
         if (_LeafNode.IsOverflowing())
         {
-            SplitNode(_LeafNode);
+            NodeSplitter.SplitNode(_LeafNode);
         }
-
-        return ???;
     }
 
-    private static int InsertIntoBranch(Node _BranchNode, Branch _Branch, LeafData _InsertData)
+    private static Rect UpdateRect(Node _LeafNode, LeafData _InsertData)
     {
-        Rect rect = new Rect(LL, UR);
-        LeafData[] leafArray = new LeafData[] { _InsertData };
-        Leaf newLeaf = new Leaf(_BranchNode, rect, leafArray, _BranchNode.Entry.NodeCapacity);
-        Node newNode = new Node(0, newLeaf);
+        float x;
+        float y;
+        float z;
 
-        Node[] oldChildren = _Branch.Children;
-        Node[] newChildren = new Node[oldChildren.Length + 1];
+        x = _InsertData.PosX < _LeafNode.Entry.Rect.LowerLeft.x ? _InsertData.PosX : _LeafNode.Entry.Rect.LowerLeft.x;
+        y = _InsertData.PosY < _LeafNode.Entry.Rect.LowerLeft.y ? _InsertData.PosY : _LeafNode.Entry.Rect.LowerLeft.y;
+        z = _InsertData.PosZ < _LeafNode.Entry.Rect.LowerLeft.z ? _InsertData.PosZ : _LeafNode.Entry.Rect.LowerLeft.z;
+        Vector3 lowerLeft = new Vector3(x, y, z);
+        x = _InsertData.PosX > _LeafNode.Entry.Rect.UpperRight.x ? _InsertData.PosX : _LeafNode.Entry.Rect.UpperRight.x;
+        y = _InsertData.PosY > _LeafNode.Entry.Rect.UpperRight.y ? _InsertData.PosY : _LeafNode.Entry.Rect.UpperRight.y;
+        z = _InsertData.PosZ > _LeafNode.Entry.Rect.UpperRight.z ? _InsertData.PosZ : _LeafNode.Entry.Rect.UpperRight.z;
+        Vector3 upperRight = new Vector3(x, y, z);
 
-        Array.Copy(oldChildren, newChildren, oldChildren.Length);
-        newChildren[oldChildren.Length] = newNode;
-
-        _Branch.Children = newChildren;
-
-        if (_BranchNode.IsOverflowing())
-        {
-            SplitNode(_BranchNode);
-        }
-
-        return ???;
-    }
-
-    private static void RebalanceTree(Node _Root)
-    {
-        throw new NotImplementedException();
-    }
-
-    private static void SplitNode(Node _NodeToSplit)
-    {
-        throw new NotImplementedException();
+        return new Rect(lowerLeft, upperRight);
     }
 
     private static Node ChooseTargetNode(Node _Root)

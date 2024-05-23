@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class RTree
@@ -17,6 +14,7 @@ public class RTree
         m_Root = _Root;
         m_Depth = 0;
         m_NodeCapacity = _NodeCapacity;
+        m_GameObjects = new List<GameObject>();
     }
 
     #region External Access
@@ -28,21 +26,21 @@ public class RTree
 
         if (m_Root.Entry == null)
         {
-            Rect rect = new Rect(LL,UR);
-            LeafData[] leafData = new LeafData[] {new LeafData(m_GameObjects.Count, pos.x, pos.y, pos.z)};
-            m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity) ;
+            Vector3 lowerLeft = new Vector3(pos.x - 10, pos.y, pos.z - 10);
+            Vector3 upperRight = new Vector3(pos.x + 10, pos.y, pos.z + 10);
+
+            Rect rect = new Rect(lowerLeft, upperRight);
+            LeafData[] leafData = new LeafData[] { new LeafData(m_GameObjects.Count, pos.x, pos.y, pos.z) };
+            m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity);
             return;
         }
 
         //return added values?
-        Inserter.InsertData(m_GameObjects.Count, pos.x, pos.y, pos.z);
+        Inserter.InsertData(m_Root, m_GameObjects.Count, pos.x, pos.y, pos.z);
 
         if (m_Root.IsOverflowing())
         {
-            Rect rect = new Rect(LL, UR);
-            Node newRoot = new Node(m_Depth + 1, new Branch(new Node(), rect, new Node[] {m_Root}, m_NodeCapacity));
-            SplitNode(newRoot);
-            m_Root = newRoot;
+            SplitRoot(pos);
         }
     }
 
@@ -71,6 +69,30 @@ public class RTree
     #endregion External Access
 
     #region Internal Methods
+
+    private void SplitRoot(Vector3 _InsertPos)
+    {
+        float x;
+        float y;
+        float z;
+
+        x = _InsertPos.x < m_Root.Entry.Rect.LowerLeft.x ? _InsertPos.x : m_Root.Entry.Rect.LowerLeft.x;
+        y = _InsertPos.y < m_Root.Entry.Rect.LowerLeft.y ? _InsertPos.y : m_Root.Entry.Rect.LowerLeft.y;
+        z = _InsertPos.z < m_Root.Entry.Rect.LowerLeft.z ? _InsertPos.z : m_Root.Entry.Rect.LowerLeft.z;
+
+        Vector3 lowerLeft = new Vector3(x, y, z);
+
+        x = _InsertPos.x > m_Root.Entry.Rect.UpperRight.x ? _InsertPos.x : m_Root.Entry.Rect.UpperRight.x;
+        y = _InsertPos.y > m_Root.Entry.Rect.UpperRight.y ? _InsertPos.y : m_Root.Entry.Rect.UpperRight.y;
+        z = _InsertPos.z > m_Root.Entry.Rect.UpperRight.z ? _InsertPos.z : m_Root.Entry.Rect.UpperRight.z;
+
+        Vector3 upperRight = new Vector3(x, y, z);
+
+        Rect rect = new Rect(lowerLeft, upperRight);
+        Node newRoot = new Node(m_Depth + 1, new Branch(new Node(), rect, new Node[] { m_Root }, m_NodeCapacity));
+        NodeSplitter.SplitNode(m_Root);
+        m_Root = newRoot;
+    }
 
     //private LeafData[] ScanRange(Rect _Range, Node _Start)
     //{
