@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using UnityEngine;
+using System.Numerics;
 
 public class RTree
 {
@@ -7,36 +7,39 @@ public class RTree
     private int m_Depth;
     private int m_NodeCapacity;
 
-    private List<GameObject> m_GameObjects;
+    private List<UnityEngine.GameObject> m_GameObjects;
 
     public RTree(Node _Root, int _NodeCapacity)
     {
         m_Root = _Root;
         m_Depth = 0;
         m_NodeCapacity = _NodeCapacity;
-        m_GameObjects = new List<GameObject>();
+        m_GameObjects = new List<UnityEngine.GameObject>();
     }
 
     #region External Access
 
-    public void Insert(GameObject _Data)
+    public void Insert(UnityEngine.GameObject _Data)
     {
         m_GameObjects.Add(_Data);
-        Vector3 pos = _Data.transform.position;
+        Vector3 pos = new Vector3();
+        pos.X = _Data.transform.position.x;
+        pos.Y = _Data.transform.position.y;
+        pos.Z = _Data.transform.position.z;
 
         if (m_Root.Entry == null)
         {
-            Vector3 lowerLeft = new Vector3(pos.x - 10, pos.y, pos.z - 10);
-            Vector3 upperRight = new Vector3(pos.x + 10, pos.y, pos.z + 10);
+            Vector3 lowerLeft = new Vector3(pos.X - 10, pos.Y, pos.Z - 10);
+            Vector3 upperRight = new Vector3(pos.X + 10, pos.Y, pos.Z + 10);
 
             Rect rect = new Rect(lowerLeft, upperRight);
-            LeafData[] leafData = new LeafData[] { new LeafData(m_GameObjects.Count, pos.x, pos.y, pos.z) };
+            LeafData[] leafData = new LeafData[] { new LeafData(m_GameObjects.Count, pos.X, pos.Y, pos.Z) };
             m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity);
             return;
         }
 
         //return added values?
-        Inserter.InsertData(m_Root, m_GameObjects.Count, pos.x, pos.y, pos.z);
+        Inserter.InsertData(m_Root, m_GameObjects.Count, pos.X, pos.Y, pos.Z);
 
         if (m_Root.IsOverflowing())
         {
@@ -44,7 +47,7 @@ public class RTree
         }
     }
 
-    public void Remove(GameObject _Obj)
+    public void Remove(UnityEngine.GameObject _Obj)
     {
     }
 
@@ -52,16 +55,14 @@ public class RTree
     {
     }
 
-    public void BatchRemove(GameObject[] _Batch)
+    public void BatchRemove(UnityEngine.GameObject[] _Batch)
     {
     }
 
     public LeafData[] FindRange(Rect _Range)
     {
-        LeafData[] searchData;
-
         //searchData = ScanRange(_Range, m_Root);
-        ParallelSearch.StartSearch(m_Root, _Range, out searchData);
+        LeafData[] searchData = TreeScanner.SearchLeafData(m_Root, _Range);
 
         return searchData;
     }
@@ -76,15 +77,15 @@ public class RTree
         float y;
         float z;
 
-        x = _InsertPos.x < m_Root.Entry.Rect.LowerLeft.x ? _InsertPos.x : m_Root.Entry.Rect.LowerLeft.x;
-        y = _InsertPos.y < m_Root.Entry.Rect.LowerLeft.y ? _InsertPos.y : m_Root.Entry.Rect.LowerLeft.y;
-        z = _InsertPos.z < m_Root.Entry.Rect.LowerLeft.z ? _InsertPos.z : m_Root.Entry.Rect.LowerLeft.z;
+        x = _InsertPos.X < m_Root.Entry.Rect.LowerLeft.X ? _InsertPos.X : m_Root.Entry.Rect.LowerLeft.X;
+        y = _InsertPos.Y < m_Root.Entry.Rect.LowerLeft.Y ? _InsertPos.Y : m_Root.Entry.Rect.LowerLeft.Y;
+        z = _InsertPos.Z < m_Root.Entry.Rect.LowerLeft.Z ? _InsertPos.Z : m_Root.Entry.Rect.LowerLeft.Z;
 
         Vector3 lowerLeft = new Vector3(x, y, z);
 
-        x = _InsertPos.x > m_Root.Entry.Rect.UpperRight.x ? _InsertPos.x : m_Root.Entry.Rect.UpperRight.x;
-        y = _InsertPos.y > m_Root.Entry.Rect.UpperRight.y ? _InsertPos.y : m_Root.Entry.Rect.UpperRight.y;
-        z = _InsertPos.z > m_Root.Entry.Rect.UpperRight.z ? _InsertPos.z : m_Root.Entry.Rect.UpperRight.z;
+        x = _InsertPos.X > m_Root.Entry.Rect.UpperRight.X ? _InsertPos.X : m_Root.Entry.Rect.UpperRight.X;
+        y = _InsertPos.Y > m_Root.Entry.Rect.UpperRight.Y ? _InsertPos.Y : m_Root.Entry.Rect.UpperRight.Y;
+        z = _InsertPos.Z > m_Root.Entry.Rect.UpperRight.Z ? _InsertPos.Z : m_Root.Entry.Rect.UpperRight.Z;
 
         Vector3 upperRight = new Vector3(x, y, z);
 

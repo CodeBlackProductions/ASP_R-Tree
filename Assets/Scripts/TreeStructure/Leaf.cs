@@ -1,10 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using UnityEngine;
-using static Unity.VisualScripting.Metadata;
-
 public class Leaf : Spatial
 {
     private Node m_Parent;

@@ -1,5 +1,5 @@
 using System;
-using UnityEngine;
+using System.Numerics;
 
 public class Inserter
 {
@@ -7,7 +7,7 @@ public class Inserter
     {
         LeafData insertData = new LeafData(_ObjIDX, _PosX, _PosY, _PosZ);
 
-        Node targetNode = ChooseTargetNode(_Root);
+        Node targetNode = ChooseTargetNode(_Root, new Vector3(_PosX, _PosY, _PosZ));
 
         if (targetNode.Entry == null)
         {
@@ -51,20 +51,20 @@ public class Inserter
         float y;
         float z;
 
-        x = _InsertData.PosX < _LeafNode.Entry.Rect.LowerLeft.x ? _InsertData.PosX : _LeafNode.Entry.Rect.LowerLeft.x;
-        y = _InsertData.PosY < _LeafNode.Entry.Rect.LowerLeft.y ? _InsertData.PosY : _LeafNode.Entry.Rect.LowerLeft.y;
-        z = _InsertData.PosZ < _LeafNode.Entry.Rect.LowerLeft.z ? _InsertData.PosZ : _LeafNode.Entry.Rect.LowerLeft.z;
+        x = _InsertData.PosX < _LeafNode.Entry.Rect.LowerLeft.X ? _InsertData.PosX : _LeafNode.Entry.Rect.LowerLeft.X;
+        y = _InsertData.PosY < _LeafNode.Entry.Rect.LowerLeft.Y ? _InsertData.PosY : _LeafNode.Entry.Rect.LowerLeft.Y;
+        z = _InsertData.PosZ < _LeafNode.Entry.Rect.LowerLeft.Z ? _InsertData.PosZ : _LeafNode.Entry.Rect.LowerLeft.Z;
         Vector3 lowerLeft = new Vector3(x, y, z);
-        x = _InsertData.PosX > _LeafNode.Entry.Rect.UpperRight.x ? _InsertData.PosX : _LeafNode.Entry.Rect.UpperRight.x;
-        y = _InsertData.PosY > _LeafNode.Entry.Rect.UpperRight.y ? _InsertData.PosY : _LeafNode.Entry.Rect.UpperRight.y;
-        z = _InsertData.PosZ > _LeafNode.Entry.Rect.UpperRight.z ? _InsertData.PosZ : _LeafNode.Entry.Rect.UpperRight.z;
+        x = _InsertData.PosX > _LeafNode.Entry.Rect.UpperRight.X ? _InsertData.PosX : _LeafNode.Entry.Rect.UpperRight.X;
+        y = _InsertData.PosY > _LeafNode.Entry.Rect.UpperRight.Y ? _InsertData.PosY : _LeafNode.Entry.Rect.UpperRight.Y;
+        z = _InsertData.PosZ > _LeafNode.Entry.Rect.UpperRight.Z ? _InsertData.PosZ : _LeafNode.Entry.Rect.UpperRight.Z;
         Vector3 upperRight = new Vector3(x, y, z);
 
         return new Rect(lowerLeft, upperRight);
     }
 
-    private static Node ChooseTargetNode(Node _Root)
+    private static Node ChooseTargetNode(Node _Root, Vector3 _ObjPos)
     {
-        throw new NotImplementedException();
+       return TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos)).Parent;
     }
 }
