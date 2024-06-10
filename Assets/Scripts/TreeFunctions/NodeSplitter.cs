@@ -4,7 +4,7 @@ using System.Numerics;
 
 internal enum Axis
 {
-    x, y, z
+    X, Y, Z
 }
 
 public class NodeSplitter
@@ -15,17 +15,17 @@ public class NodeSplitter
 
         if (_NodeToSplit.Entry is Branch branch)
         {
-            float spreadX = CalculateSpread(Axis.x, branch);
-            float spreadY = CalculateSpread(Axis.y, branch);
-            float spreadZ = CalculateSpread(Axis.z, branch);
+            float spreadX = CalculateSpread(Axis.X, branch);
+            float spreadY = CalculateSpread(Axis.Y, branch);
+            float spreadZ = CalculateSpread(Axis.Z, branch);
 
            splitAxis = FindLargestSpread(spreadX, spreadY, spreadZ);
         }
         else if (_NodeToSplit.Entry is Leaf leaf)
         {
-            float spreadX = CalculateSpread(Axis.x, leaf);
-            float spreadY = CalculateSpread(Axis.y, leaf);
-            float spreadZ = CalculateSpread(Axis.z, leaf);
+            float spreadX = CalculateSpread(Axis.X, leaf);
+            float spreadY = CalculateSpread(Axis.Y, leaf);
+            float spreadZ = CalculateSpread(Axis.Z, leaf);
 
             splitAxis = FindLargestSpread(spreadX, spreadY, spreadZ);
         }
@@ -79,13 +79,13 @@ public class NodeSplitter
     {
         switch (_Axis)
         {
-            case Axis.x:
+            case Axis.X:
                 return _Vector.X;
 
-            case Axis.y:
+            case Axis.Y:
                 return _Vector.Y;
 
-            case Axis.z:
+            case Axis.Z:
                 return _Vector.Z;
 
             default:
@@ -97,13 +97,13 @@ public class NodeSplitter
     {
         switch (_Axis)
         {
-            case Axis.x:
+            case Axis.X:
                 return _Object.PosX;
 
-            case Axis.y:
+            case Axis.Y:
                 return _Object.PosY;
 
-            case Axis.z:
+            case Axis.Z:
                 return _Object.PosZ;
 
             default:
