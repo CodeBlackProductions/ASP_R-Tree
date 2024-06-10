@@ -9,11 +9,6 @@ public class Inserter
 
         Node targetNode = ChooseTargetNode(_Root, new Vector3(_PosX, _PosY, _PosZ));
 
-        if (targetNode.Entry == null)
-        {
-            throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
-        }
-
         if (targetNode.Entry is Leaf leaf)
         {
             InsertIntoLeaf(targetNode, leaf, insertData);
@@ -23,7 +18,7 @@ public class Inserter
             throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
         }
 
-        TreeBalancer.RebalanceTree(_Root);
+        //TreeBalancer.RebalanceTree(_Root);
     }
 
     private static void InsertIntoLeaf(Node _LeafNode, Leaf _Leaf, LeafData _InsertData)
@@ -65,6 +60,6 @@ public class Inserter
 
     private static Node ChooseTargetNode(Node _Root, Vector3 _ObjPos)
     {
-       return TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos)).Parent;
+        return TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos)).Parent;
     }
 }
