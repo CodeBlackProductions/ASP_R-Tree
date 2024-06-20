@@ -15,23 +15,170 @@ public class NodeSplitter
 
         if (_NodeToSplit.Entry is Branch branch)
         {
-            float spreadX = CalculateSpread(Axis.X, branch);
-            float spreadY = CalculateSpread(Axis.Y, branch);
-            float spreadZ = CalculateSpread(Axis.Z, branch);
+            splitAxis = CalculateSplitAxis(branch);
 
-           splitAxis = FindLargestSpread(spreadX, spreadY, spreadZ);
+            Node[] sortArray;
+            SortAlongAxis(branch, splitAxis, out sortArray);
+
+            int pivot = FindPivotEntry(sortArray);
+
+            Node[][] splitChildren = SplitChildren(sortArray, pivot);
+
+            Node[] newNodes = CreateNewNodes(branch.Parent, _NodeToSplit.Level, splitChildren, branch.NodeCapacity);
+
+            Branch parent = branch.Parent.Entry as Branch;
+
+            UpdateParentChildren(parent, _NodeToSplit, newNodes);
         }
         else if (_NodeToSplit.Entry is Leaf leaf)
         {
-            float spreadX = CalculateSpread(Axis.X, leaf);
-            float spreadY = CalculateSpread(Axis.Y, leaf);
-            float spreadZ = CalculateSpread(Axis.Z, leaf);
+            splitAxis = CalculateSplitAxis(leaf);
 
-            splitAxis = FindLargestSpread(spreadX, spreadY, spreadZ);
+            LeafData[] sortArray;
+            SortAlongAxis(leaf, splitAxis, out sortArray);
+
+            int pivot = FindPivotEntry(sortArray);
+
+            LeafData[][] splitChildren = SplitChildren(sortArray, pivot);
+
+            Node[] newNodes = CreateNewNodes(leaf.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity);
+
+            Branch parent = leaf.Parent.Entry as Branch;
+
+            UpdateParentChildren(parent, _NodeToSplit, newNodes);
         }
-
-        //Do Split Stuff here
     }
+
+    #region Methods for the actual split
+
+    private static void UpdateParentChildren(Branch _Parent, Node _OldNode, Node[] _NewNodes)
+    {
+        Node[] newChildren = new Node[_Parent.Children.Length + 1];
+
+        for (int i = 0; i < _Parent.Children.Length; i++)
+        {
+            if (_Parent.Children[i].ID == _OldNode.ID)
+            {
+                newChildren[i] = _NewNodes[0];
+            }
+            else
+            {
+                newChildren[i] = _Parent.Children[i];
+            }
+        }
+        newChildren[_Parent.Children.Length] = _NewNodes[1];
+
+        _Parent.Children = newChildren;
+    }
+
+    private static Node[] CreateNewNodes(Node _Parent, int _Level, Node[][] _SplitChildren, int _NodeCapacity)
+    {
+        Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity));
+        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity));
+        return new Node[] { nodeA, nodeB };
+    }
+
+    private static Node[] CreateNewNodes(Node _Parent, int _Level, LeafData[][] _SplitChildren, int _NodeCapacity)
+    {
+        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity));
+        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity));
+        return new Node[] { nodeA, nodeB };
+    }
+
+    private static Rect CreateNewNodeRect(Node[] _Nodes)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static Rect CreateNewNodeRect(LeafData[] _Nodes)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static int FindPivotEntry(Node[] _Data)
+    {
+        int pivotIndex = 0;
+
+        pivotIndex = (int)Math.Round(_Data.Length * 0.5f);
+
+        return pivotIndex;
+    }
+
+    private static int FindPivotEntry(LeafData[] _Data)
+    {
+        int pivotIndex = 0;
+
+        pivotIndex = (int)Math.Round(_Data.Length * 0.5f) - 1;
+
+        return pivotIndex;
+    }
+
+    private static Node[][] SplitChildren(Node[] _SortedArray, int _PivotIndex)
+    {
+        Node[] nodesA = new Node[_PivotIndex + 1];
+        Node[] nodesB = new Node[_SortedArray.Length - (_PivotIndex + 1)];
+
+        Array.Copy(_SortedArray, 0, nodesA, 0, _PivotIndex + 1);
+        Array.Copy(_SortedArray, _PivotIndex + 1, nodesB, 0, nodesB.Length);
+
+        return new Node[][] { nodesA, nodesB };
+    }
+
+    private static LeafData[][] SplitChildren(LeafData[] _SortedArray, int _PivotIndex)
+    {
+        LeafData[] dataA = new LeafData[_PivotIndex + 1];
+        LeafData[] dataB = new LeafData[_SortedArray.Length - (_PivotIndex + 1)];
+
+        Array.Copy(_SortedArray, 0, dataA, 0, _PivotIndex + 1);
+        Array.Copy(_SortedArray, _PivotIndex + 1, dataB, 0, dataB.Length);
+
+        return new LeafData[][] { dataA, dataB };
+    }
+
+    #endregion Methods for the actual split
+
+    #region Methods to sort along axis
+
+    private static void SortAlongAxis(Branch _NodeEntry, Axis _SplitAxis, out Node[] _SortedArray)
+    {
+        _SortedArray = _NodeEntry.Children
+                                 .OrderBy(item => GetAxisCoordinate(CalculateCenterOfRect(item.Entry.Rect), _SplitAxis))
+                                 .ToArray();
+    }
+
+    private static void SortAlongAxis(Leaf _NodeEntry, Axis _SplitAxis, out LeafData[] _SortedArray)
+    {
+        _SortedArray = _NodeEntry.Data
+                                 .OrderBy(item => GetAxisCoordinate(new Vector3(item.PosX, item.PosY, item.PosZ), _SplitAxis))
+                                 .ToArray();
+    }
+
+    private static Vector3 CalculateCenterOfRect(Rect _Rect)
+    {
+        return (_Rect.LowerLeft + _Rect.UpperRight) * 0.5f;
+    }
+
+    private static float GetAxisCoordinate(Vector3 _Pos, Axis _Axis)
+    {
+        switch (_Axis)
+        {
+            case Axis.X:
+                return _Pos.X;
+
+            case Axis.Y:
+                return _Pos.Y;
+
+            case Axis.Z:
+                return _Pos.Z;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(_Axis), "Invalid axis specified for sorting.");
+        }
+    }
+
+    #endregion Methods to sort along axis
+
+    #region Methods for finding target axis
 
     private static float CalculateSpread(Axis _Axis, Branch _Branch)
     {
@@ -89,7 +236,7 @@ public class NodeSplitter
                 return _Vector.Z;
 
             default:
-                throw new InvalidOperationException("Invalid Axis while trying to split Node!");
+                throw new ArgumentOutOfRangeException("Invalid Axis while trying to split Node!");
         }
     }
 
@@ -107,16 +254,34 @@ public class NodeSplitter
                 return _Object.PosZ;
 
             default:
-                throw new InvalidOperationException("Invalid Axis while trying to split Node!");
+                throw new ArgumentOutOfRangeException("Invalid Axis while trying to split Node!");
         }
     }
 
-    private static Axis FindLargestSpread(float _X, float _Y, float _Z) 
+    private static Axis FindLargestSpread(float _X, float _Y, float _Z)
     {
-        float[] val = new float[]{ _X,_Y,_Z};
+        float[] val = new float[] { _X, _Y, _Z };
 
         int maxIndex = Array.IndexOf(val, val.Max());
 
         return (Axis)maxIndex;
     }
+
+    private static Axis CalculateSplitAxis(Branch _Branch)
+    {
+        float spreadX = CalculateSpread(Axis.X, _Branch);
+        float spreadY = CalculateSpread(Axis.Y, _Branch);
+        float spreadZ = CalculateSpread(Axis.Z, _Branch);
+        return FindLargestSpread(spreadX, spreadY, spreadZ);
+    }
+
+    private static Axis CalculateSplitAxis(Leaf _Leaf)
+    {
+        float spreadX = CalculateSpread(Axis.X, _Leaf);
+        float spreadY = CalculateSpread(Axis.Y, _Leaf);
+        float spreadZ = CalculateSpread(Axis.Z, _Leaf);
+        return FindLargestSpread(spreadX, spreadY, spreadZ);
+    }
+
+    #endregion Methods for finding target axis
 }
