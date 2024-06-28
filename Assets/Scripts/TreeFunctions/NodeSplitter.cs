@@ -15,37 +15,47 @@ public class NodeSplitter
 
         if (_NodeToSplit.Entry is Branch branch)
         {
-            splitAxis = CalculateSplitAxis(branch);
+            if (branch.Parent.Entry is Branch parent)
+            {
+                splitAxis = CalculateSplitAxis(branch);
 
-            Node[] sortArray;
-            SortAlongAxis(branch, splitAxis, out sortArray);
+                Node[] sortArray;
+                SortAlongAxis(branch, splitAxis, out sortArray);
 
-            int pivot = FindPivotEntry(sortArray);
+                int pivot = FindPivotEntry(sortArray);
 
-            Node[][] splitChildren = SplitChildren(sortArray, pivot);
+                Node[][] splitChildren = SplitChildren(sortArray, pivot);
 
-            Node[] newNodes = CreateNewNodes(branch.Parent, _NodeToSplit.Level, splitChildren, branch.NodeCapacity);
+                Node[] newNodes = CreateNewNodes(branch.Parent, _NodeToSplit.Level, splitChildren, branch.NodeCapacity);
 
-            Branch parent = branch.Parent.Entry as Branch;
-
-            UpdateParentChildren(parent, _NodeToSplit, newNodes);
+                UpdateParentChildren(parent, _NodeToSplit, newNodes);
+            }
+            else
+            {
+                return;
+            }
         }
         else if (_NodeToSplit.Entry is Leaf leaf)
         {
-            splitAxis = CalculateSplitAxis(leaf);
+            if (leaf.Parent.Entry is Branch parent)
+            {
+                splitAxis = CalculateSplitAxis(leaf);
 
-            LeafData[] sortArray;
-            SortAlongAxis(leaf, splitAxis, out sortArray);
+                LeafData[] sortArray;
+                SortAlongAxis(leaf, splitAxis, out sortArray);
 
-            int pivot = FindPivotEntry(sortArray);
+                int pivot = FindPivotEntry(sortArray);
 
-            LeafData[][] splitChildren = SplitChildren(sortArray, pivot);
+                LeafData[][] splitChildren = SplitChildren(sortArray, pivot);
 
-            Node[] newNodes = CreateNewNodes(leaf.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity);
+                Node[] newNodes = CreateNewNodes(leaf.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity);
 
-            Branch parent = leaf.Parent.Entry as Branch;
-
-            UpdateParentChildren(parent, _NodeToSplit, newNodes);
+                UpdateParentChildren(parent, _NodeToSplit, newNodes);
+            }
+            else
+            {
+                return;
+            }
         }
     }
 

@@ -92,6 +92,7 @@ public class RTree
 
         Rect rect = new Rect(lowerLeft, upperRight);
         Node newRoot = new Node(m_Depth + 1, new Branch(new Node(), rect, new Node[] { m_Root }, m_NodeCapacity));
+        m_Root.Entry.Parent = newRoot;
         NodeSplitter.SplitNode(m_Root);
         m_Root = newRoot;
     }
