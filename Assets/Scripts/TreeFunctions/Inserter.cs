@@ -18,7 +18,7 @@ public class Inserter
             throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
         }
 
-        //TreeBalancer.RebalanceTree(_Root);
+        TreeBalancer.RebalanceTree(_Root);
     }
 
     private static void InsertIntoLeaf(Node _LeafNode, Leaf _Leaf, LeafData _InsertData)
@@ -46,13 +46,16 @@ public class Inserter
         float y;
         float z;
 
-        x = _InsertData.PosX < _LeafNode.Entry.Rect.LowerLeft.X ? _InsertData.PosX : _LeafNode.Entry.Rect.LowerLeft.X;
-        y = _InsertData.PosY < _LeafNode.Entry.Rect.LowerLeft.Y ? _InsertData.PosY : _LeafNode.Entry.Rect.LowerLeft.Y;
-        z = _InsertData.PosZ < _LeafNode.Entry.Rect.LowerLeft.Z ? _InsertData.PosZ : _LeafNode.Entry.Rect.LowerLeft.Z;
+        x = Math.Min(_InsertData.PosX, _LeafNode.Entry.Rect.LowerLeft.X);
+        y = Math.Min(_InsertData.PosY, _LeafNode.Entry.Rect.LowerLeft.Y);
+        z = Math.Min(_InsertData.PosZ, _LeafNode.Entry.Rect.LowerLeft.Z);
+
         Vector3 lowerLeft = new Vector3(x, y, z);
-        x = _InsertData.PosX > _LeafNode.Entry.Rect.UpperRight.X ? _InsertData.PosX : _LeafNode.Entry.Rect.UpperRight.X;
-        y = _InsertData.PosY > _LeafNode.Entry.Rect.UpperRight.Y ? _InsertData.PosY : _LeafNode.Entry.Rect.UpperRight.Y;
-        z = _InsertData.PosZ > _LeafNode.Entry.Rect.UpperRight.Z ? _InsertData.PosZ : _LeafNode.Entry.Rect.UpperRight.Z;
+
+        x = Math.Max(_InsertData.PosX, _LeafNode.Entry.Rect.UpperRight.X);
+        y = Math.Max(_InsertData.PosY, _LeafNode.Entry.Rect.UpperRight.Y);
+        z = Math.Max(_InsertData.PosZ, _LeafNode.Entry.Rect.UpperRight.Z);
+
         Vector3 upperRight = new Vector3(x, y, z);
 
         return new Rect(lowerLeft, upperRight);

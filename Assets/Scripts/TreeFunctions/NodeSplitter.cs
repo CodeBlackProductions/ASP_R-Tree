@@ -87,12 +87,60 @@ public class NodeSplitter
 
     private static Rect CreateNewNodeRect(Node[] _Nodes)
     {
-        throw new NotImplementedException();
+        if (_Nodes == null || _Nodes.Length == 0)
+        {
+            throw new ArgumentException("Nodes array cannot be null or empty when creating new Rect", nameof(_Nodes));
+        }
+
+        Vector3 lowerLeft = _Nodes[0].Entry.Rect.LowerLeft;
+        Vector3 upperRight = _Nodes[0].Entry.Rect.UpperRight;
+
+        for (int i = 1; i < _Nodes.Length; i++)
+        {
+            Rect currentRect = _Nodes[i].Entry.Rect;
+
+            lowerLeft.X = Math.Min(currentRect.LowerLeft.X, lowerLeft.X);
+            lowerLeft.Y = Math.Min(currentRect.LowerLeft.Y, lowerLeft.Y);
+            lowerLeft.Z = Math.Min(currentRect.LowerLeft.Z, lowerLeft.Z);
+
+            upperRight.X = Math.Max(currentRect.UpperRight.X, upperRight.X);
+            upperRight.Y = Math.Max(currentRect.UpperRight.Y, upperRight.Y);
+            upperRight.Z = Math.Max(currentRect.UpperRight.Z, upperRight.Z);
+        }
+
+        return new Rect(lowerLeft, upperRight);
     }
 
     private static Rect CreateNewNodeRect(LeafData[] _Nodes)
     {
-        throw new NotImplementedException();
+        if (_Nodes == null || _Nodes.Length == 0)
+        {
+            throw new ArgumentException("LeafData array cannot be null or empty when creating new Rect", nameof(_Nodes));
+        }
+
+        float X = _Nodes[0].PosX;
+        float Y = _Nodes[0].PosY;
+        float Z = _Nodes[0].PosZ;
+
+        Vector3 lowerLeft = new Vector3(X, Y, Z);
+        Vector3 upperRight = new Vector3(X, Y, Z);
+
+        for (int i = 1; i < _Nodes.Length; i++)
+        {
+            X = _Nodes[i].PosX;
+            Y = _Nodes[i].PosY;
+            Z = _Nodes[i].PosZ;
+
+            lowerLeft.X = Math.Min(X, lowerLeft.X);
+            lowerLeft.Y = Math.Min(Y, lowerLeft.Y);
+            lowerLeft.Z = Math.Min(Z, lowerLeft.Z);
+
+            upperRight.X = Math.Max(X, upperRight.X);
+            upperRight.Y = Math.Max(Y, upperRight.Y);
+            upperRight.Z = Math.Max(Z, upperRight.Z);
+        }
+
+        return new Rect(lowerLeft, upperRight);
     }
 
     private static int FindPivotEntry(Node[] _Data)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -77,15 +78,15 @@ public class RTree
         float y;
         float z;
 
-        x = _InsertPos.X < m_Root.Entry.Rect.LowerLeft.X ? _InsertPos.X : m_Root.Entry.Rect.LowerLeft.X;
-        y = _InsertPos.Y < m_Root.Entry.Rect.LowerLeft.Y ? _InsertPos.Y : m_Root.Entry.Rect.LowerLeft.Y;
-        z = _InsertPos.Z < m_Root.Entry.Rect.LowerLeft.Z ? _InsertPos.Z : m_Root.Entry.Rect.LowerLeft.Z;
+        x = Math.Min(_InsertPos.X, m_Root.Entry.Rect.LowerLeft.X);
+        y = Math.Min(_InsertPos.Y, m_Root.Entry.Rect.LowerLeft.Y);
+        z = Math.Min(_InsertPos.Z, m_Root.Entry.Rect.LowerLeft.Z);
 
         Vector3 lowerLeft = new Vector3(x, y, z);
 
-        x = _InsertPos.X > m_Root.Entry.Rect.UpperRight.X ? _InsertPos.X : m_Root.Entry.Rect.UpperRight.X;
-        y = _InsertPos.Y > m_Root.Entry.Rect.UpperRight.Y ? _InsertPos.Y : m_Root.Entry.Rect.UpperRight.Y;
-        z = _InsertPos.Z > m_Root.Entry.Rect.UpperRight.Z ? _InsertPos.Z : m_Root.Entry.Rect.UpperRight.Z;
+        x = Math.Max(_InsertPos.X, m_Root.Entry.Rect.UpperRight.X);
+        y = Math.Max(_InsertPos.Y, m_Root.Entry.Rect.UpperRight.Y);
+        z = Math.Max(_InsertPos.Z, m_Root.Entry.Rect.UpperRight.Z);
 
         Vector3 upperRight = new Vector3(x, y, z);
 
