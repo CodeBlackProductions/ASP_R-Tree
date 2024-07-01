@@ -1,45 +1,83 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public static class TreeDebugger
+public class TreeDebugger : MonoBehaviour
 {
+    public static TreeDebugger Instance;
 
-    public static void DrawDebug(Node _Root)
+    [SerializeField] private GameObject cubePrefab;
+
+    private Dictionary<Node, GameObject> cubeMap = new Dictionary<Node, GameObject>();
+
+    private void Awake()
     {
-        
-
-        if (_Root.Entry is Leaf)
+        if (Instance == null)
         {
-            DrawCube(CalculateDrawCenter(_Root), CalculateDrawSize(_Root), _Root.Level);
+            Instance = this;
         }
-        else if (_Root.Entry is Branch branch)
+        else 
         {
+            Destroy(this.gameObject);
+        }
+    }
+
+    public void DrawDebug(Node root)
+    {
+        ClearCubes();
+        DrawNode(root);
+    }
+
+    private void DrawNode(Node node)
+    {
+        if (node.Entry is Leaf)
+        {
+            CreateCube(node, "Leaf");
+        }
+        else if (node.Entry is Branch branch)
+        {
+            CreateCube(node, "Branch");
             for (int i = 0; i < branch.Children.Length; i++)
             {
-                DrawDebug(branch.Children[i]);
-            }         
+                DrawNode(branch.Children[i]);
+            }
         }
     }
 
-    private static Vector3 CalculateDrawCenter(Node _Root)
+    private void CreateCube(Node node, string name)
     {
-        float X = (_Root.Entry.Rect.LowerLeft.X + _Root.Entry.Rect.UpperRight.X) * 0.5f;
-        float Y = (_Root.Entry.Rect.LowerLeft.Y + _Root.Entry.Rect.UpperRight.Y) * 0.5f;
-        float Z = (_Root.Entry.Rect.LowerLeft.Z + _Root.Entry.Rect.UpperRight.Z) * 0.5f;
-        return new Vector3(X, Y, Z);
+        if (cubePrefab == null)
+        {
+            Debug.LogError("Cube prefab is not set in TreeDebugger.");
+            return;
+        }
+
+        Rect rect = node.Entry.Rect;
+        System.Numerics.Vector3 center = (rect.LowerLeft + rect.UpperRight) * 0.5f;
+        System.Numerics.Vector3 size = rect.UpperRight - rect.LowerLeft;
+
+        GameObject cube = Instantiate(cubePrefab, ToUnityVector3(center), Quaternion.identity);
+        cube.transform.localScale = ToUnityVector3(size);
+        cube.name = name;
+
+        cubeMap[node] = cube;
+
+        if (node.Parent != null && cubeMap.ContainsKey(node.Parent))
+        {
+            cube.transform.parent = cubeMap[node.Parent].transform;
+        }
     }
 
-    private static Vector3 CalculateDrawSize(Node _Root)
+    private Vector3 ToUnityVector3(System.Numerics.Vector3 vector)
     {
-        float X = (_Root.Entry.Rect.UpperRight.X - _Root.Entry.Rect.LowerLeft.X);
-        float Y = (_Root.Entry.Rect.UpperRight.Y - _Root.Entry.Rect.LowerLeft.Y);
-        float Z = (_Root.Entry.Rect.UpperRight.Z - _Root.Entry.Rect.LowerLeft.Z);
-        return new Vector3(X, Y, Z);
+        return new Vector3(vector.X, vector.Y, vector.Z);
     }
 
-    private static void DrawCube(Vector3 _Center, Vector3 _Size, int _Depth)
+    private void ClearCubes()
     {
-        Gizmos.color = new Color(0 + (_Depth *0.1f), 0 + (_Depth * 0.1f), 0 + (_Depth * 0.1f));
-        Gizmos.DrawWireCube(_Center, _Size);
-        Gizmos.color = Color.white;
+        foreach (var cube in cubeMap.Values)
+        {
+           Destroy(cube);
+        }
+        cubeMap.Clear();
     }
 }

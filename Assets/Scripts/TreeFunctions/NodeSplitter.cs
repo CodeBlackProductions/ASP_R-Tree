@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -11,12 +12,27 @@ public class NodeSplitter
 {
     public static void SplitNode(Node _NodeToSplit)
     {
-        Axis splitAxis;
+        Stack<Node> splitStack = new Stack<Node>();
+        splitStack.Push(_NodeToSplit);
 
-        if (_NodeToSplit.Entry is Branch branch)
+        while (splitStack.Count > 0)
         {
-            if (branch.Parent.Entry is Branch parent)
+            Axis splitAxis;
+
+            Node localNodeToSplit = splitStack.Pop();
+
+            if (localNodeToSplit.Parent == null || localNodeToSplit.Parent == localNodeToSplit || localNodeToSplit.Parent.Entry is Leaf)
             {
+                PrepareRootSplit(localNodeToSplit);
+            }
+
+            if (localNodeToSplit.Entry is Branch branch)
+            {
+                if (localNodeToSplit.Parent.Entry is not Branch parentBranch)
+                {
+                    return;
+                }
+              
                 splitAxis = CalculateSplitAxis(branch);
 
                 Node[] sortArray;
@@ -26,19 +42,22 @@ public class NodeSplitter
 
                 Node[][] splitChildren = SplitChildren(sortArray, pivot);
 
-                Node[] newNodes = CreateNewNodes(branch.Parent, _NodeToSplit.Level, splitChildren, branch.NodeCapacity);
+                Node[] newNodes = CreateNewNodes(localNodeToSplit.Parent, localNodeToSplit.Level, splitChildren, branch.NodeCapacity);
 
-                UpdateParentChildren(parent, _NodeToSplit, newNodes);
+                UpdateParentChildren(parentBranch, localNodeToSplit, newNodes);
+
+                if (localNodeToSplit.Parent.IsOverflowing())
+                {
+                    splitStack.Push(localNodeToSplit.Parent);
+                }
             }
-            else
+            else if (localNodeToSplit.Entry is Leaf leaf)
             {
-                return;
-            }
-        }
-        else if (_NodeToSplit.Entry is Leaf leaf)
-        {
-            if (leaf.Parent.Entry is Branch parent)
-            {
+                if (localNodeToSplit.Parent.Entry is not Branch parentBranch)
+                {
+                    return;
+                }
+
                 splitAxis = CalculateSplitAxis(leaf);
 
                 LeafData[] sortArray;
@@ -48,15 +67,26 @@ public class NodeSplitter
 
                 LeafData[][] splitChildren = SplitChildren(sortArray, pivot);
 
-                Node[] newNodes = CreateNewNodes(leaf.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity);
+                Node[] newNodes = CreateNewNodes(localNodeToSplit.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity);
 
-                UpdateParentChildren(parent, _NodeToSplit, newNodes);
-            }
-            else
-            {
-                return;
+                UpdateParentChildren(parentBranch, localNodeToSplit, newNodes);
+
+                if (localNodeToSplit.Parent.IsOverflowing())
+                {
+                    splitStack.Push(localNodeToSplit.Parent);
+                }
             }
         }
+    }
+
+    public static void PrepareRootSplit(Node _NodeToSplit)
+    {
+        Node newRoot = new Node(_NodeToSplit.Level + 1,
+                                new Branch(_NodeToSplit, _NodeToSplit.Entry.Rect, new Node[] { _NodeToSplit }, _NodeToSplit.Entry.NodeCapacity),
+                                _NodeToSplit, _NodeToSplit.ParentTree);
+
+        _NodeToSplit.Parent = newRoot;
+        _NodeToSplit.ParentTree.Root = newRoot;
     }
 
     #region Methods for the actual split
@@ -83,15 +113,20 @@ public class NodeSplitter
 
     private static Node[] CreateNewNodes(Node _Parent, int _Level, Node[][] _SplitChildren, int _NodeCapacity)
     {
-        Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity));
-        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity));
+        Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity), _Parent, _Parent.ParentTree);
+        nodeA.Entry.Parent = nodeA;
+        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), _Parent, _Parent.ParentTree);
+        nodeB.Entry.Parent = nodeB;
+
         return new Node[] { nodeA, nodeB };
     }
 
     private static Node[] CreateNewNodes(Node _Parent, int _Level, LeafData[][] _SplitChildren, int _NodeCapacity)
     {
-        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity));
-        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity));
+        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity), _Parent, _Parent.ParentTree);
+        nodeA.Entry.Parent = nodeA;
+        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), _Parent, _Parent.ParentTree);
+        nodeB.Entry.Parent = nodeB;
         return new Node[] { nodeA, nodeB };
     }
 
