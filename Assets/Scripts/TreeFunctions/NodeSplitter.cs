@@ -115,8 +115,16 @@ public class NodeSplitter
     {
         Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity), _Parent, _Parent.ParentTree);
         nodeA.Entry.Parent = nodeA;
+        for (int i = 0; i < _SplitChildren[0].Length; i++)
+        {
+            _SplitChildren[0][i].Parent = nodeA;
+        }
         Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), _Parent, _Parent.ParentTree);
         nodeB.Entry.Parent = nodeB;
+        for (int i = 0; i < _SplitChildren[1].Length; i++)
+        {
+            _SplitChildren[1][i].Parent = nodeB;
+        }
 
         return new Node[] { nodeA, nodeB };
     }

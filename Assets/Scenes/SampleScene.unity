@@ -502,7 +502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2f9fda5e25f7a04daebfdec0cd92050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NumberOfObjects: 20
+  m_NumberOfObjects: 30
   m_PositionRangeMax: 20
   m_PositionRangeMin: 0
 --- !u!4 &1570001093
