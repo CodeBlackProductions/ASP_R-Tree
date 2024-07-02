@@ -458,6 +458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cubePrefab: {fileID: 2767697854457125170, guid: f4005dc90c6d6154c8d7b98b662f2b8e,
     type: 3}
+  m_UseGizmos: 1
 --- !u!4 &1186413569
 Transform:
   m_ObjectHideFlags: 0
@@ -502,7 +503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2f9fda5e25f7a04daebfdec0cd92050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NumberOfObjects: 30
+  m_NumberOfObjects: 50
   m_PositionRangeMax: 20
   m_PositionRangeMin: 0
 --- !u!4 &1570001093

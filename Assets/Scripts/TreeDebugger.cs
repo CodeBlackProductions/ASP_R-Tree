@@ -6,6 +6,7 @@ public class TreeDebugger : MonoBehaviour
     public static TreeDebugger Instance;
 
     [SerializeField] private GameObject cubePrefab;
+    [SerializeField] private bool m_UseGizmos;
 
     private Dictionary<Node, GameObject> cubeMap = new Dictionary<Node, GameObject>();
 
@@ -15,7 +16,7 @@ public class TreeDebugger : MonoBehaviour
         {
             Instance = this;
         }
-        else 
+        else
         {
             Destroy(this.gameObject);
         }
@@ -23,7 +24,10 @@ public class TreeDebugger : MonoBehaviour
 
     public void DrawDebug(Node root)
     {
-        ClearCubes();
+        if (!m_UseGizmos)
+        {
+            ClearCubes();
+        }
         DrawNode(root);
     }
 
@@ -45,7 +49,7 @@ public class TreeDebugger : MonoBehaviour
 
     private void CreateCube(Node node, string name)
     {
-        if (cubePrefab == null)
+        if (!m_UseGizmos && cubePrefab == null)
         {
             Debug.LogError("Cube prefab is not set in TreeDebugger.");
             return;
@@ -55,15 +59,22 @@ public class TreeDebugger : MonoBehaviour
         System.Numerics.Vector3 center = (rect.LowerLeft + rect.UpperRight) * 0.5f;
         System.Numerics.Vector3 size = rect.UpperRight - rect.LowerLeft;
 
-        GameObject cube = Instantiate(cubePrefab, ToUnityVector3(center), Quaternion.identity);
-        cube.transform.localScale = ToUnityVector3(size);
-        cube.name = name;
-
-        cubeMap[node] = cube;
-
-        if (node.Parent != null && cubeMap.ContainsKey(node.Parent))
+        if (m_UseGizmos)
         {
-            cube.transform.parent = cubeMap[node.Parent].transform;
+            Gizmos.DrawWireCube(ToUnityVector3(center), ToUnityVector3(size));
+        }
+        else
+        {
+            GameObject cube = Instantiate(cubePrefab, ToUnityVector3(center), Quaternion.identity);
+            cube.transform.localScale = ToUnityVector3(size);
+            cube.name = name;
+
+            cubeMap[node] = cube;
+
+            if (node.Parent != null && cubeMap.ContainsKey(node.Parent))
+            {
+                cube.transform.parent = cubeMap[node.Parent].transform;
+            }
         }
     }
 
@@ -76,7 +87,7 @@ public class TreeDebugger : MonoBehaviour
     {
         foreach (var cube in cubeMap.Values)
         {
-           Destroy(cube);
+            Destroy(cube);
         }
         cubeMap.Clear();
     }

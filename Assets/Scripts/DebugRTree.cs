@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class DebugRTree : MonoBehaviour
@@ -8,20 +7,20 @@ public class DebugRTree : MonoBehaviour
     [SerializeField] private float m_PositionRangeMax;
     [SerializeField] private float m_PositionRangeMin;
 
-    RTree tree;
-    Node root;
-    float timer = 0.5f;
+    private RTree tree;
+    private Node root;
+    private float timer = 0.1f;
     private int currentObjectCount = 0;
 
     private void Awake()
     {
-        root = new Node(0, new Leaf(root, new Rect(new System.Numerics.Vector3(0,0,0), new System.Numerics.Vector3(1,1,1)), new LeafData[0], 5),root,null);
+        root = new Node(0, new Leaf(root, new Rect(new System.Numerics.Vector3(0, 0, 0), new System.Numerics.Vector3(1, 1, 1)), new LeafData[0], 5), root, null);
         root.Entry.Parent = root;
-        tree = new RTree(root,5);
+        tree = new RTree(root, 5);
         root.ParentTree = tree;
     }
 
-    private void Update() 
+    private void Update()
     {
         if (timer <= 0 && currentObjectCount < m_NumberOfObjects)
         {
@@ -29,13 +28,21 @@ public class DebugRTree : MonoBehaviour
             temp.transform.position = new Vector3(Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax));
             temp.transform.parent = gameObject.transform;
             tree.Insert(temp);
+            SceneView.RepaintAll();
             currentObjectCount++;
-            TreeDebugger.Instance?.DrawDebug(tree.Root);
-            timer = 0.5f;
+            timer = 0.1f;
         }
-        else 
+        else
         {
             timer -= Time.deltaTime;
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (Application.isPlaying)
+        {
+            TreeDebugger.Instance?.DrawDebug(tree.Root);
         }
     }
 }
