@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -56,7 +55,6 @@ public class RTree
 
     public LeafData[] FindRange(Rect _Range)
     {
-        //searchData = ScanRange(_Range, m_Root);
         LeafData[] searchData = TreeScanner.SearchLeafData(m_Root, _Range);
 
         return searchData;

@@ -113,13 +113,18 @@ public class NodeSplitter
 
     private static Node[] CreateNewNodes(Node _Parent, int _Level, Node[][] _SplitChildren, int _NodeCapacity)
     {
-        Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity), _Parent, _Parent.ParentTree);
+        Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0],
+                                                _NodeCapacity), _Parent, _Parent.ParentTree);
+
         nodeA.Entry.Parent = nodeA;
         for (int i = 0; i < _SplitChildren[0].Length; i++)
         {
             _SplitChildren[0][i].Parent = nodeA;
         }
-        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), _Parent, _Parent.ParentTree);
+
+        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity),
+                                                _Parent, _Parent.ParentTree);
+
         nodeB.Entry.Parent = nodeB;
         for (int i = 0; i < _SplitChildren[1].Length; i++)
         {
@@ -131,10 +136,14 @@ public class NodeSplitter
 
     private static Node[] CreateNewNodes(Node _Parent, int _Level, LeafData[][] _SplitChildren, int _NodeCapacity)
     {
-        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity), _Parent, _Parent.ParentTree);
+        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity),
+                                                                         _Parent, _Parent.ParentTree);
         nodeA.Entry.Parent = nodeA;
-        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), _Parent, _Parent.ParentTree);
+
+        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), 
+                                                                         _Parent, _Parent.ParentTree);
         nodeB.Entry.Parent = nodeB;
+
         return new Node[] { nodeA, nodeB };
     }
 
@@ -296,10 +305,11 @@ public class NodeSplitter
         for (int i = 1; i < _Branch.Children.Length; i++)
         {
             Node child = _Branch.Children[i];
-            lowMin = GetCoordinate(child.Entry.Rect.LowerLeft, _Axis) < lowMin ? GetCoordinate(child.Entry.Rect.LowerLeft, _Axis) : lowMin;
-            lowMax = GetCoordinate(child.Entry.Rect.LowerLeft, _Axis) > lowMax ? GetCoordinate(child.Entry.Rect.LowerLeft, _Axis) : lowMax;
-            highMin = GetCoordinate(child.Entry.Rect.UpperRight, _Axis) < highMin ? GetCoordinate(child.Entry.Rect.UpperRight, _Axis) : highMin;
-            highMax = GetCoordinate(child.Entry.Rect.UpperRight, _Axis) > highMax ? GetCoordinate(child.Entry.Rect.UpperRight, _Axis) : highMax;
+            
+            lowMin = Math.Min(GetCoordinate(child.Entry.Rect.LowerLeft, _Axis), lowMin);
+            lowMax = Math.Max(GetCoordinate(child.Entry.Rect.LowerLeft, _Axis), lowMax);
+            highMin = Math.Min(GetCoordinate(child.Entry.Rect.UpperRight, _Axis), highMin);
+            highMax = Math.Max(GetCoordinate(child.Entry.Rect.UpperRight, _Axis), highMax);
         }
 
         return (lowMax - lowMin) + (highMax - highMin);
@@ -316,8 +326,8 @@ public class NodeSplitter
         for (int i = 1; i < _Leaf.Data.Length; i++)
         {
             LeafData obj = _Leaf.Data[i];
-            min = GetCoordinate(obj, _Axis) < min ? GetCoordinate(obj, _Axis) : min;
-            max = GetCoordinate(obj, _Axis) > max ? GetCoordinate(obj, _Axis) : max;
+            min = Math.Min(GetCoordinate(obj, _Axis), min);
+            max = Math.Max(GetCoordinate(obj, _Axis), max);
         }
 
         return max - min;

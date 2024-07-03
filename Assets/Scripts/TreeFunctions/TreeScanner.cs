@@ -13,7 +13,9 @@ public static class TreeScanner
         }
         if (_Range.LowerLeft.X > _Range.UpperRight.X || _Range.LowerLeft.Y > _Range.UpperRight.Y)
         {
-            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X + " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X + " | " + _Range.UpperRight.Y);
+            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X +
+                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X + 
+                                                " | " + _Range.UpperRight.Y);
         }
 
         LeafData[] result;
@@ -29,7 +31,9 @@ public static class TreeScanner
         }
         if (_Range.LowerLeft.X > _Range.UpperRight.X || _Range.LowerLeft.Y > _Range.UpperRight.Y)
         {
-            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X + " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X + " | " + _Range.UpperRight.Y);
+            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X +
+                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X + 
+                                                " | " + _Range.UpperRight.Y);
         }
 
         Leaf result;
