@@ -42,7 +42,7 @@ public class DebugRTree : MonoBehaviour
             tree.Remove(currentObjectCount - 1);
             SceneView.RepaintAll();
             currentObjectCount--;
-            timer = 0.1f;
+            timer = 0.5f;
         }
         else
         {

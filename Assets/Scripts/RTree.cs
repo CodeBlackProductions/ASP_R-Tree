@@ -7,7 +7,6 @@ public class RTree
     private Node m_Root;
     private int m_NodeCapacity;
 
-
     private int m_IndexCounter = 0;
     private Dictionary<int, UnityEngine.GameObject> m_GameObjects;
     private Dictionary<UnityEngine.GameObject, int> m_Indices;
@@ -28,7 +27,6 @@ public class RTree
     {
         m_GameObjects.Add(m_IndexCounter, _Obj);
         m_Indices.Add(_Obj, m_IndexCounter);
-        m_IndexCounter++;
 
         Vector3 pos = new Vector3(_Obj.transform.position.x, _Obj.transform.position.y, _Obj.transform.position.z);
 
@@ -38,12 +36,14 @@ public class RTree
             Vector3 upperRight = new Vector3(pos.X + 10, pos.Y, pos.Z + 10);
 
             Rect rect = new Rect(lowerLeft, upperRight);
-            LeafData[] leafData = new LeafData[] { new LeafData(m_GameObjects.Count, pos.X, pos.Y, pos.Z) };
+            LeafData[] leafData = new LeafData[] { new LeafData(m_IndexCounter, pos.X, pos.Y, pos.Z) };
             m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity);
             return;
         }
 
-        Inserter.InsertData(m_Root, m_GameObjects.Count, pos.X, pos.Y, pos.Z);
+        Inserter.InsertData(m_Root, m_IndexCounter, pos.X, pos.Y, pos.Z);
+
+        m_IndexCounter++;
     }
 
     public void Remove(UnityEngine.GameObject _Obj)
