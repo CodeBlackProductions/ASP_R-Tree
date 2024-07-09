@@ -18,7 +18,7 @@ public class Inserter
             throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
         }
 
-        TreeBalancer.RebalanceTree(_Root);
+        //TreeBalancer.RebalanceTree(_Root);
     }
 
     private static void InsertIntoLeaf(Node _LeafNode, Leaf _Leaf, LeafData _InsertData)

@@ -61,7 +61,12 @@ public class TreeDebugger : MonoBehaviour
 
         if (m_UseGizmos)
         {
+            if (node.Entry is Leaf)
+            {
+                Gizmos.color = Color.green;
+            }
             Gizmos.DrawWireCube(ToUnityVector3(center), ToUnityVector3(size));
+            Gizmos.color = Color.white;
         }
         else
         {

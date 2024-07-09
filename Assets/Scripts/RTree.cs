@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using System.Numerics;
+using UnityEditor;
 
 public class RTree
 {
     private Node m_Root;
     private int m_NodeCapacity;
 
-    private List<UnityEngine.GameObject> m_GameObjects;
+
+    private int m_IndexCounter = 0;
+    private Dictionary<int, UnityEngine.GameObject> m_GameObjects;
+    private Dictionary<UnityEngine.GameObject, int> m_Indices;
 
     public Node Root { get => m_Root; set => m_Root = value; }
 
@@ -14,18 +18,19 @@ public class RTree
     {
         m_Root = _Root;
         m_NodeCapacity = _NodeCapacity;
-        m_GameObjects = new List<UnityEngine.GameObject>();
+        m_GameObjects = new Dictionary<int, UnityEngine.GameObject>();
+        m_Indices = new Dictionary<UnityEngine.GameObject, int>();
     }
 
     #region External Access
 
-    public void Insert(UnityEngine.GameObject _Data)
+    public void Insert(UnityEngine.GameObject _Obj)
     {
-        m_GameObjects.Add(_Data);
-        Vector3 pos = new Vector3();
-        pos.X = _Data.transform.position.x;
-        pos.Y = _Data.transform.position.y;
-        pos.Z = _Data.transform.position.z;
+        m_GameObjects.Add(m_IndexCounter, _Obj);
+        m_Indices.Add(_Obj, m_IndexCounter);
+        m_IndexCounter++;
+
+        Vector3 pos = new Vector3(_Obj.transform.position.x, _Obj.transform.position.y, _Obj.transform.position.z);
 
         if (m_Root.Entry == null)
         {
@@ -43,6 +48,32 @@ public class RTree
 
     public void Remove(UnityEngine.GameObject _Obj)
     {
+        if (m_GameObjects.ContainsValue(_Obj))
+        {
+            int index = m_Indices[_Obj];
+
+            Vector3 pos = new Vector3(_Obj.transform.position.x, _Obj.transform.position.y, _Obj.transform.position.z);
+
+            Remover.Remove(m_Root, index, pos);
+
+            m_GameObjects.Remove(m_Indices[_Obj]);
+            m_Indices.Remove(_Obj);
+        }
+    }
+
+    public void Remove(int _Idx)
+    {
+        if (m_GameObjects[_Idx])
+        {
+            Vector3 pos = new Vector3(m_GameObjects[_Idx].transform.position.x,
+                                      m_GameObjects[_Idx].transform.position.y,
+                                      m_GameObjects[_Idx].transform.position.z);
+
+            Remover.Remove(m_Root, _Idx, pos);
+
+            m_Indices.Remove(m_GameObjects[_Idx]);
+            m_GameObjects.Remove(_Idx);
+        }
     }
 
     public void BatchInsert(LeafData[] _Batch)

@@ -11,6 +11,7 @@ public class DebugRTree : MonoBehaviour
     private Node root;
     private float timer = 0.1f;
     private int currentObjectCount = 0;
+    private bool doneInserting = false;
 
     private void Awake()
     {
@@ -22,7 +23,7 @@ public class DebugRTree : MonoBehaviour
 
     private void Update()
     {
-        if (timer <= 0 && currentObjectCount < m_NumberOfObjects)
+        if (timer <= 0 && !doneInserting && currentObjectCount < m_NumberOfObjects)
         {
             GameObject temp = new GameObject();
             temp.transform.position = new Vector3(Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax));
@@ -30,6 +31,17 @@ public class DebugRTree : MonoBehaviour
             tree.Insert(temp);
             SceneView.RepaintAll();
             currentObjectCount++;
+            if (currentObjectCount == m_NumberOfObjects)
+            {
+                doneInserting = true;
+            }
+            timer = 0.1f;
+        }
+        else if (timer <= 0 && doneInserting && currentObjectCount > 0)
+        {
+            tree.Remove(currentObjectCount - 1);
+            SceneView.RepaintAll();
+            currentObjectCount--;
             timer = 0.1f;
         }
         else
