@@ -116,7 +116,7 @@ public class NodeSplitter
         Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0],
                                                 _NodeCapacity), _Parent, _Parent.ParentTree);
 
-        nodeA.Entry.Parent = nodeA;
+        nodeA.Entry.EncapsulatingNode = nodeA;
         for (int i = 0; i < _SplitChildren[0].Length; i++)
         {
             _SplitChildren[0][i].Parent = nodeA;
@@ -125,7 +125,7 @@ public class NodeSplitter
         Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity),
                                                 _Parent, _Parent.ParentTree);
 
-        nodeB.Entry.Parent = nodeB;
+        nodeB.Entry.EncapsulatingNode = nodeB;
         for (int i = 0; i < _SplitChildren[1].Length; i++)
         {
             _SplitChildren[1][i].Parent = nodeB;
@@ -138,11 +138,11 @@ public class NodeSplitter
     {
         Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity),
                                                                          _Parent, _Parent.ParentTree);
-        nodeA.Entry.Parent = nodeA;
+        nodeA.Entry.EncapsulatingNode = nodeA;
 
         Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), 
                                                                          _Parent, _Parent.ParentTree);
-        nodeB.Entry.Parent = nodeB;
+        nodeB.Entry.EncapsulatingNode = nodeB;
 
         return new Node[] { nodeA, nodeB };
     }

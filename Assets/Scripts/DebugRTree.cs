@@ -16,7 +16,7 @@ public class DebugRTree : MonoBehaviour
     private void Awake()
     {
         root = new Node(0, new Leaf(root, new Rect(new System.Numerics.Vector3(0, 0, 0), new System.Numerics.Vector3(1, 1, 1)), new LeafData[0], 5), root, null);
-        root.Entry.Parent = root;
+        root.Entry.EncapsulatingNode = root;
         tree = new RTree(root, 5);
         root.ParentTree = tree;
     }
@@ -37,12 +37,12 @@ public class DebugRTree : MonoBehaviour
             }
             timer = 0.1f;
         }
-        else if (timer <= 0 && doneInserting && currentObjectCount > 0)
+        else if (timer <= 0 && doneInserting && currentObjectCount > 1)
         {
             tree.Remove(currentObjectCount - 1);
             SceneView.RepaintAll();
             currentObjectCount--;
-            timer = 0.5f;
+            timer = 0.1f;
         }
         else
         {

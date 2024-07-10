@@ -63,6 +63,6 @@ public class Inserter
 
     private static Node ChooseTargetNode(Node _Root, Vector3 _ObjPos)
     {
-        return TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos)).Parent;
+        return TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos)).EncapsulatingNode;
     }
 }

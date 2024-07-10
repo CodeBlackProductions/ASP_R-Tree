@@ -7,8 +7,13 @@ public class TreeDebugger : MonoBehaviour
 
     [SerializeField] private GameObject cubePrefab;
     [SerializeField] private bool m_UseGizmos;
+    [SerializeField] private Material m_WhiteMat;
+    [SerializeField] private Material m_GreenMat;
+    [SerializeField] private Material m_RedMat;
 
     private Dictionary<Node, GameObject> cubeMap = new Dictionary<Node, GameObject>();
+    private Node m_Root;
+
 
     private void Awake()
     {
@@ -24,6 +29,7 @@ public class TreeDebugger : MonoBehaviour
 
     public void DrawDebug(Node root)
     {
+        m_Root = root;
         if (!m_UseGizmos)
         {
             ClearCubes();
@@ -65,6 +71,10 @@ public class TreeDebugger : MonoBehaviour
             {
                 Gizmos.color = Color.green;
             }
+            if (node == m_Root) 
+            {
+                Gizmos.color = Color.red;
+            }
             Gizmos.DrawWireCube(ToUnityVector3(center), ToUnityVector3(size));
             Gizmos.color = Color.white;
         }
@@ -73,6 +83,15 @@ public class TreeDebugger : MonoBehaviour
             GameObject cube = Instantiate(cubePrefab, ToUnityVector3(center), Quaternion.identity);
             cube.transform.localScale = ToUnityVector3(size);
             cube.name = name;
+
+            if (node.Entry is Leaf)
+            {
+                cube.GetComponent<Renderer>().material = m_GreenMat;
+            }
+            if (node == m_Root)
+            {
+                cube.GetComponent<Renderer>().material = m_RedMat;
+            }
 
             cubeMap[node] = cube;
 

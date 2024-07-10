@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using System.Reflection;
 
 public class Remover
 {
@@ -41,7 +42,7 @@ public class Remover
 
         if (leaf.EntryCount <= 0)
         {
-            RemoveNode(leaf.Parent);
+            RemoveNode(leaf.EncapsulatingNode);
         }
         else
         {
@@ -75,8 +76,79 @@ public class Remover
         return new Rect(lowerLeft, upperRight);
     }
 
+    private static Rect UpdateRect(Branch _Branch)
+    {
+        float x = _Branch.Children[0].Entry.Rect.LowerLeft.X;
+        float y = _Branch.Children[0].Entry.Rect.LowerLeft.Y;
+        float z = _Branch.Children[0].Entry.Rect.LowerLeft.Z;
+
+        Vector3 lowerLeft = new Vector3(x, y, z);
+
+        x = _Branch.Children[0].Entry.Rect.UpperRight.X;
+        y = _Branch.Children[0].Entry.Rect.UpperRight.Y;
+        z = _Branch.Children[0].Entry.Rect.UpperRight.Z;
+
+        Vector3 upperRight = new Vector3(x, y, z);
+
+        for (int i = 0; i < _Branch.Children.Length; i++)
+        {
+            lowerLeft.X = Math.Min(lowerLeft.X,  _Branch.Children[i].Entry.Rect.LowerLeft.X);
+            lowerLeft.Y = Math.Min(lowerLeft.Y,  _Branch.Children[i].Entry.Rect.LowerLeft.Y);
+            lowerLeft.Z = Math.Min(lowerLeft.Z, _Branch.Children[i].Entry.Rect.LowerLeft.Z);
+
+            upperRight.X = Math.Max(upperRight.X,  _Branch.Children[i].Entry.Rect.UpperRight.X);
+            upperRight.Y = Math.Max(upperRight.Y,  _Branch.Children[i].Entry.Rect.UpperRight.Y);
+            upperRight.Z = Math.Max(upperRight.Z, _Branch.Children[i].Entry.Rect.UpperRight.Z);
+        }
+
+        return new Rect(lowerLeft, upperRight);
+    }
+
     private static void RemoveNode(Node _NodeToRemove)
     {
-        throw new NotImplementedException();
+
+        Guid guid = _NodeToRemove.ID;
+
+        Branch parent = (_NodeToRemove.Parent.Entry as Branch);
+
+        Node[] newData = new Node[parent.Children.Length - 1];
+
+        int targetIndex = -1;
+        for (int i = 0; i < parent.Children.Length; i++)
+        {
+            if (parent.Children[i].ID != guid)
+            {
+                continue;
+            }
+            targetIndex = i;
+            break;
+        }
+
+        if (targetIndex == -1)
+        {
+            return;
+        }
+
+        if (targetIndex > 0)
+        {
+            Array.Copy(parent.Children, 0, newData, 0, targetIndex);
+            Array.Copy(parent.Children, targetIndex + 1, newData, targetIndex, parent.Children.Length - (targetIndex + 1));
+        }
+        else
+        {
+            Array.Copy(parent.Children, 1, newData, 0, newData.Length);
+        }
+
+        parent.Children = newData;
+
+        if (parent.EntryCount <= 0)
+        {
+            RemoveNode(parent.EncapsulatingNode);
+        }
+        else
+        {
+            Rect rect = UpdateRect(parent);
+            parent.Rect = rect;
+        }
     }
 }

@@ -459,6 +459,9 @@ MonoBehaviour:
   cubePrefab: {fileID: 2767697854457125170, guid: f4005dc90c6d6154c8d7b98b662f2b8e,
     type: 3}
   m_UseGizmos: 1
+  m_WhiteMat: {fileID: 2100000, guid: da23a69eaf4ff454bb82f93d2c39aa4c, type: 2}
+  m_GreenMat: {fileID: 2100000, guid: 76eb6a8dc0ea4364fa6300dd3aefcbf4, type: 2}
+  m_RedMat: {fileID: 2100000, guid: b813c04dddeed78449a7552ea675e296, type: 2}
 --- !u!4 &1186413569
 Transform:
   m_ObjectHideFlags: 0

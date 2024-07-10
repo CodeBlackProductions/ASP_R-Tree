@@ -1,6 +1,6 @@
 public abstract class Spatial
 {
-    public abstract Node Parent { get; set; }
+    public abstract Node EncapsulatingNode { get; set; }
 
     public abstract Rect Rect { get; set; }
 
