@@ -62,7 +62,7 @@ public class TreeDebugger : MonoBehaviour
         }
 
         Rect rect = node.Entry.Rect;
-        System.Numerics.Vector3 center = (rect.LowerLeft + rect.UpperRight) * 0.5f;
+        System.Numerics.Vector3 center = rect.GetCenter();
         System.Numerics.Vector3 size = rect.UpperRight - rect.LowerLeft;
 
         if (m_UseGizmos)

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+
 public class LeafSearch
 {
     public void StartSearch(Node _Root, Rect _Range, out Leaf _Result)
@@ -40,17 +41,17 @@ public class LeafSearch
             }
         });
 
-        Vector3 rangeCenter = CalculateRectCenter(_Range.LowerLeft, _Range.UpperRight);
+        Vector3 rangeCenter = _Range.GetCenter();
 
         if (intersectingLeaves.Count > 0)
         {
             _Result = intersectingLeaves.OrderBy(leaf =>
-            Vector3.DistanceSquared(rangeCenter, CalculateRectCenter(leaf.Rect.LowerLeft, leaf.Rect.UpperRight))).First();
+            Vector3.DistanceSquared(rangeCenter, leaf.Rect.GetCenter())).First();
         }
         else
         {
             _Result = nonIntersectingLeaves.OrderBy(leaf =>
-             Vector3.DistanceSquared(rangeCenter, CalculateRectCenter(leaf.Rect.LowerLeft, leaf.Rect.UpperRight))).First();
+             Vector3.DistanceSquared(rangeCenter, leaf.Rect.GetCenter())).First();
         }
     }
 
@@ -98,14 +99,5 @@ public class LeafSearch
         }
 
         return resultData;
-    }
-
-    private Vector3 CalculateRectCenter(Vector3 _LowerLeft, Vector3 _UpperRight)
-    {
-        float centerX = (_LowerLeft.X + _UpperRight.X) / 2f;
-        float centerY = (_LowerLeft.Y + _UpperRight.Y) / 2f;
-        float centerZ = (_LowerLeft.Z + _UpperRight.Z) / 2f;
-
-        return new Vector3(centerX, centerY, centerZ);
     }
 }

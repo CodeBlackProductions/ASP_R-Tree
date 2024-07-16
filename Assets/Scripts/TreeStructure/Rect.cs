@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-public struct Rect
+public class Rect
 {
     private Vector3 lowerLeft;
     private Vector3 upperRight;
@@ -12,5 +12,10 @@ public struct Rect
     {
         lowerLeft = _LowerLeft;
         upperRight = _UpperRight;
+    }
+
+    public Vector3 GetCenter()
+    {
+        return (lowerLeft + upperRight) * 0.5f;
     }
 }

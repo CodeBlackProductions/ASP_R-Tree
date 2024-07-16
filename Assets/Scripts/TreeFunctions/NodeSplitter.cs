@@ -252,7 +252,7 @@ public class NodeSplitter
     private static void SortAlongAxis(Branch _NodeEntry, Axis _SplitAxis, out Node[] _SortedArray)
     {
         _SortedArray = _NodeEntry.Children
-                                 .OrderBy(item => GetAxisCoordinate(CalculateCenterOfRect(item.Entry.Rect), _SplitAxis))
+                                 .OrderBy(item => GetAxisCoordinate(item.Entry.Rect.GetCenter(), _SplitAxis))
                                  .ToArray();
     }
 
@@ -261,11 +261,6 @@ public class NodeSplitter
         _SortedArray = _NodeEntry.Data
                                  .OrderBy(item => GetAxisCoordinate(new Vector3(item.PosX, item.PosY, item.PosZ), _SplitAxis))
                                  .ToArray();
-    }
-
-    private static Vector3 CalculateCenterOfRect(Rect _Rect)
-    {
-        return (_Rect.LowerLeft + _Rect.UpperRight) * 0.5f;
     }
 
     private static float GetAxisCoordinate(Vector3 _Pos, Axis _Axis)
