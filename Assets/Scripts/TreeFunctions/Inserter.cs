@@ -17,8 +17,6 @@ public class Inserter
         {
             throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
         }
-
-        //TreeBalancer.RebalanceTree(_Root);
     }
 
     private static void InsertIntoLeaf(Node _LeafNode, Leaf _Leaf, LeafData _InsertData)
@@ -31,34 +29,12 @@ public class Inserter
 
         _Leaf.Data = newData;
 
-        Rect rect = UpdateRect(_LeafNode, _InsertData);
-        _Leaf.Rect = rect;
+        _Leaf.UpdateRect();
 
         if (_LeafNode.IsOverflowing())
         {
             NodeSplitter.SplitNode(_LeafNode);
         }
-    }
-
-    private static Rect UpdateRect(Node _LeafNode, LeafData _InsertData)
-    {
-        float x;
-        float y;
-        float z;
-
-        x = Math.Min(_InsertData.PosX, _LeafNode.Entry.Rect.LowerLeft.X);
-        y = Math.Min(_InsertData.PosY, _LeafNode.Entry.Rect.LowerLeft.Y);
-        z = Math.Min(_InsertData.PosZ, _LeafNode.Entry.Rect.LowerLeft.Z);
-
-        Vector3 lowerLeft = new Vector3(x, y, z);
-
-        x = Math.Max(_InsertData.PosX, _LeafNode.Entry.Rect.UpperRight.X);
-        y = Math.Max(_InsertData.PosY, _LeafNode.Entry.Rect.UpperRight.Y);
-        z = Math.Max(_InsertData.PosZ, _LeafNode.Entry.Rect.UpperRight.Z);
-
-        Vector3 upperRight = new Vector3(x, y, z);
-
-        return new Rect(lowerLeft, upperRight);
     }
 
     private static Node ChooseTargetNode(Node _Root, Vector3 _ObjPos)

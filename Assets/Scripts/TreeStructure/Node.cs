@@ -34,4 +34,16 @@ public class Node
             return false;
         }
     }
+
+    public bool IsUnderflowing() 
+    {
+        if (m_Entry.EntryCount < m_Entry.MinNodeCapacity)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

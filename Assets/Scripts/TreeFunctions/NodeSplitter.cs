@@ -42,7 +42,7 @@ public class NodeSplitter
 
                 Node[][] splitChildren = SplitChildren(sortArray, pivot);
 
-                Node[] newNodes = CreateNewNodes(localNodeToSplit.Parent, localNodeToSplit.Level, splitChildren, branch.NodeCapacity);
+                Node[] newNodes = CreateNewNodes(localNodeToSplit.Parent, localNodeToSplit.Level, splitChildren, branch.NodeCapacity, branch.MinNodeCapacity);
 
                 UpdateParentChildren(parentBranch, localNodeToSplit, newNodes);
 
@@ -67,7 +67,7 @@ public class NodeSplitter
 
                 LeafData[][] splitChildren = SplitChildren(sortArray, pivot);
 
-                Node[] newNodes = CreateNewNodes(localNodeToSplit.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity);
+                Node[] newNodes = CreateNewNodes(localNodeToSplit.Parent, _NodeToSplit.Level, splitChildren, leaf.NodeCapacity, leaf.MinNodeCapacity);
 
                 UpdateParentChildren(parentBranch, localNodeToSplit, newNodes);
 
@@ -82,7 +82,7 @@ public class NodeSplitter
     public static void PrepareRootSplit(Node _NodeToSplit)
     {
         Node newRoot = new Node(_NodeToSplit.Level + 1,
-                                new Branch(_NodeToSplit, _NodeToSplit.Entry.Rect, new Node[] { _NodeToSplit }, _NodeToSplit.Entry.NodeCapacity),
+                                new Branch(_NodeToSplit, _NodeToSplit.Entry.Rect, new Node[] { _NodeToSplit }, _NodeToSplit.Entry.NodeCapacity, _NodeToSplit.Entry.MinNodeCapacity),
                                 _NodeToSplit, _NodeToSplit.ParentTree);
 
         _NodeToSplit.Parent = newRoot;
@@ -111,10 +111,10 @@ public class NodeSplitter
         _Parent.Children = newChildren;
     }
 
-    private static Node[] CreateNewNodes(Node _Parent, int _Level, Node[][] _SplitChildren, int _NodeCapacity)
+    private static Node[] CreateNewNodes(Node _Parent, int _Level, Node[][] _SplitChildren, int _NodeCapacity, int _MinNodeCapacity)
     {
         Node nodeA = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0],
-                                                _NodeCapacity), _Parent, _Parent.ParentTree);
+                                                _NodeCapacity, _MinNodeCapacity), _Parent, _Parent.ParentTree);
 
         nodeA.Entry.EncapsulatingNode = nodeA;
         for (int i = 0; i < _SplitChildren[0].Length; i++)
@@ -122,7 +122,7 @@ public class NodeSplitter
             _SplitChildren[0][i].Parent = nodeA;
         }
 
-        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity),
+        Node nodeB = new Node(_Level, new Branch(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity, _MinNodeCapacity),
                                                 _Parent, _Parent.ParentTree);
 
         nodeB.Entry.EncapsulatingNode = nodeB;
@@ -134,13 +134,13 @@ public class NodeSplitter
         return new Node[] { nodeA, nodeB };
     }
 
-    private static Node[] CreateNewNodes(Node _Parent, int _Level, LeafData[][] _SplitChildren, int _NodeCapacity)
+    private static Node[] CreateNewNodes(Node _Parent, int _Level, LeafData[][] _SplitChildren, int _NodeCapacity, int _MinNodeCapacity)
     {
-        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity),
+        Node nodeA = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[0]), _SplitChildren[0], _NodeCapacity, _MinNodeCapacity),
                                                                          _Parent, _Parent.ParentTree);
         nodeA.Entry.EncapsulatingNode = nodeA;
 
-        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity), 
+        Node nodeB = new Node(_Level, new Leaf(_Parent, CreateNewNodeRect(_SplitChildren[1]), _SplitChildren[1], _NodeCapacity, _MinNodeCapacity), 
                                                                          _Parent, _Parent.ParentTree);
         nodeB.Entry.EncapsulatingNode = nodeB;
 

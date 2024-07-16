@@ -7,4 +7,8 @@ public abstract class Spatial
     public abstract int EntryCount { get; }
 
     public abstract int NodeCapacity { get; }
+
+    public abstract int MinNodeCapacity { get; }
+
+    public abstract void UpdateRect();
 }

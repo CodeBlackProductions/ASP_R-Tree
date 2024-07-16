@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Numerics;
-using UnityEditor;
 
 public class RTree
 {
     private Node m_Root;
     private int m_NodeCapacity;
+    private int m_MinNodeCapacity;
 
     private int m_IndexCounter = 0;
     private Dictionary<int, UnityEngine.GameObject> m_GameObjects;
@@ -13,12 +13,13 @@ public class RTree
 
     public Node Root { get => m_Root; set => m_Root = value; }
 
-    public RTree(Node _Root, int _NodeCapacity)
+    public RTree(Node _Root, int _NodeCapacity, int nodeMinCapacity)
     {
         m_Root = _Root;
         m_NodeCapacity = _NodeCapacity;
         m_GameObjects = new Dictionary<int, UnityEngine.GameObject>();
         m_Indices = new Dictionary<UnityEngine.GameObject, int>();
+        m_MinNodeCapacity = nodeMinCapacity;
     }
 
     #region External Access
@@ -37,7 +38,7 @@ public class RTree
 
             Rect rect = new Rect(lowerLeft, upperRight);
             LeafData[] leafData = new LeafData[] { new LeafData(m_IndexCounter, pos.X, pos.Y, pos.Z) };
-            m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity);
+            m_Root.Entry = new Leaf(m_Root, rect, leafData, m_NodeCapacity, m_MinNodeCapacity);
             return;
         }
 
