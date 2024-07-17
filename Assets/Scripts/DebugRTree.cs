@@ -1,11 +1,15 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 public class DebugRTree : MonoBehaviour
 {
+    [SerializeField] private GameObject m_PrefabObject;
     [SerializeField] private int m_NumberOfObjects;
     [SerializeField] private float m_PositionRangeMax;
     [SerializeField] private float m_PositionRangeMin;
+    [SerializeField] private bool m_RemoveAfterInsert;
+    [SerializeField] private bool m_RandomizePositions;
 
     private RTree tree;
     private Node root;
@@ -13,11 +17,13 @@ public class DebugRTree : MonoBehaviour
     private int currentObjectCount = 0;
     private bool doneInserting = false;
 
+    private List<GameObject> objects = new List<GameObject>();
+
     private void Awake()
     {
-        root = new Node(0, new Leaf(root, new Rect(new System.Numerics.Vector3(0, 0, 0), new System.Numerics.Vector3(1, 1, 1)), new LeafData[0], 10,5), root, null);
+        root = new Node(0, new Leaf(root, new Rect(new System.Numerics.Vector3(0, 0, 0), new System.Numerics.Vector3(1, 1, 1)), new LeafData[0], 10, 5), root, null);
         root.Entry.EncapsulatingNode = root;
-        tree = new RTree(root, 10,5);
+        tree = new RTree(root, 10, 5);
         root.ParentTree = tree;
     }
 
@@ -25,9 +31,29 @@ public class DebugRTree : MonoBehaviour
     {
         if (timer <= 0 && !doneInserting && currentObjectCount < m_NumberOfObjects)
         {
-            GameObject temp = new GameObject();
+            GameObject temp = null;
+            DebugObj objController = null;
+
+            if (m_PrefabObject != null)
+            {
+                temp = Instantiate<GameObject>(m_PrefabObject);
+                objController = temp.GetComponent<DebugObj>();
+                objController.Tree = tree;
+            }
+            else
+            {
+                temp = new GameObject();
+            }
+
             temp.transform.position = new Vector3(Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax));
             temp.transform.parent = gameObject.transform;
+
+            if (objController != null)
+            {
+                objController.UpdatePos();
+            }
+
+            objects.Add(temp);
             tree.Insert(temp);
             SceneView.RepaintAll();
             currentObjectCount++;
@@ -37,12 +63,22 @@ public class DebugRTree : MonoBehaviour
             }
             timer = 0.1f;
         }
-        else if (timer <= 0 && doneInserting && currentObjectCount > 1)
+        else if (m_RemoveAfterInsert && timer <= 0 && doneInserting && currentObjectCount > 1)
         {
-            tree.Remove(currentObjectCount - 1);
+            tree.Remove(objects[objects.Count - 1]);
             SceneView.RepaintAll();
             currentObjectCount--;
+            GameObject temp = objects[objects.Count - 1];
+            objects.Remove(temp);
+            Destroy(temp);
             timer = 0.1f;
+        }
+        else if (m_RandomizePositions && timer <= 0 && doneInserting)
+        {
+            float newX = Random.Range(m_PositionRangeMin, m_PositionRangeMax);
+            float newY = Random.Range(m_PositionRangeMin, m_PositionRangeMax);
+            float newZ = Random.Range(m_PositionRangeMin, m_PositionRangeMax);
+            objects[Random.Range(0, objects.Count - 1)].gameObject.transform.position = new Vector3(newX, newY, newZ);
         }
         else
         {

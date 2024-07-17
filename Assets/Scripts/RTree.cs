@@ -85,6 +85,12 @@ public class RTree
     {
     }
 
+    public void UpdateObjectPosition(UnityEngine.GameObject _Obj) 
+    {
+        Remove(_Obj);
+        Insert(_Obj);
+    }
+
     public LeafData[] FindRange(Rect _Range)
     {
         LeafData[] searchData = TreeScanner.SearchLeafData(m_Root, _Range);
