@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 
-public class NodeMerger
+public class NodeRebalancer
 {
     public static void RebalanceNodes(Node _TargetNode)
     {
@@ -130,10 +130,26 @@ public class NodeMerger
 
     private static void MergeNode(Leaf _TargetLeaf, Leaf _PartnerLeaf)
     {
+        LeafData[] mergedData = new LeafData[_TargetLeaf.EntryCount + _PartnerLeaf.EntryCount];
+
+        Array.Copy(_TargetLeaf.Data, 0, mergedData, 0, _TargetLeaf.EntryCount);
+        Array.Copy(_PartnerLeaf.Data, 0, mergedData, _TargetLeaf.EntryCount, _PartnerLeaf.EntryCount);
+
+        _TargetLeaf.Data = mergedData;
+
+        Remover.RemoveNode(_PartnerLeaf.EncapsulatingNode);
     }
 
     private static void MergeNode(Branch _TargetBranch, Branch _PartnerBranch)
     {
+        Node[] mergedData = new Node[_TargetBranch.EntryCount + _PartnerBranch.EntryCount];
+
+        Array.Copy(_TargetBranch.Children, 0, mergedData, 0, _TargetBranch.EntryCount);
+        Array.Copy(_PartnerBranch.Children, 0, mergedData, _TargetBranch.EntryCount, _PartnerBranch.EntryCount);
+
+        _TargetBranch.Children = mergedData;
+
+        Remover.RemoveNode(_PartnerBranch.EncapsulatingNode);
     }
 
     private static int CompareProximity(Vector3 _TargetCenter, LeafData _A, LeafData _B)

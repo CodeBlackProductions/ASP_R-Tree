@@ -4,7 +4,7 @@ using System.Reflection;
 
 public class Remover
 {
-    public static void Remove(Node _Root, int _Index, Vector3 _Pos)
+    public static void RemoveEntry(Node _Root, int _Index, Vector3 _Pos)
     {
         Rect range = new Rect(_Pos, _Pos);
 
@@ -50,14 +50,14 @@ public class Remover
 
             if (leaf.EncapsulatingNode.IsUnderflowing())
             {
-                NodeMerger.RebalanceNodes(leaf.EncapsulatingNode);
+                NodeRebalancer.RebalanceNodes(leaf.EncapsulatingNode);
             }
             
         }
 
     }
 
-    private static void RemoveNode(Node _NodeToRemove)
+    public static void RemoveNode(Node _NodeToRemove)
     {
 
         Guid guid = _NodeToRemove.ID;
@@ -104,7 +104,7 @@ public class Remover
 
             if (parent.EncapsulatingNode.IsUnderflowing())
             {
-                NodeMerger.RebalanceNodes(parent.EncapsulatingNode);
+                NodeRebalancer.RebalanceNodes(parent.EncapsulatingNode);
             }
         }
     }

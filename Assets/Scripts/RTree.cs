@@ -55,7 +55,7 @@ public class RTree
 
             Vector3 pos = new Vector3(_Obj.transform.position.x, _Obj.transform.position.y, _Obj.transform.position.z);
 
-            Remover.Remove(m_Root, index, pos);
+            Remover.RemoveEntry(m_Root, index, pos);
 
             m_GameObjects.Remove(m_Indices[_Obj]);
             m_Indices.Remove(_Obj);
@@ -70,7 +70,7 @@ public class RTree
                                       m_GameObjects[_Idx].transform.position.y,
                                       m_GameObjects[_Idx].transform.position.z);
 
-            Remover.Remove(m_Root, _Idx, pos);
+            Remover.RemoveEntry(m_Root, _Idx, pos);
 
             m_Indices.Remove(m_GameObjects[_Idx]);
             m_GameObjects.Remove(_Idx);
