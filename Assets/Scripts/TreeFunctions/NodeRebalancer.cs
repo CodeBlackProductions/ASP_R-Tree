@@ -20,6 +20,8 @@ public class NodeRebalancer
                 Leaf mergeLeaf = null;
                 int amountToRedistribute = leaf.MinNodeCapacity - leaf.EntryCount;
 
+                Array.Sort(targetParent.Children, (a, b) => CompareProximity(leaf.Rect.GetCenter(), a, b));
+
                 for (int i = 0; i < targetParent.EntryCount; i++)
                 {
                     if (targetParent.Children[i] == _TargetNode)
@@ -57,6 +59,8 @@ public class NodeRebalancer
                 Branch redistributeBranch = null;
                 Branch mergeBranch = null;
                 int amountToRedistribute = branch.MinNodeCapacity - branch.EntryCount;
+
+                Array.Sort(targetParent.Children, (a, b) => CompareProximity(branch.Rect.GetCenter(), a, b));
 
                 for (int i = 0; i < targetParent.EntryCount; i++)
                 {
