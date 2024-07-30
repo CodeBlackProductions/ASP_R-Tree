@@ -109,6 +109,7 @@ public class NodeSplitter
         newChildren[_Parent.Children.Length] = _NewNodes[1];
 
         _Parent.Children = newChildren;
+        _Parent.UpdateRect();
     }
 
     private static Node[] CreateNewNodes(Node _Parent, int _Level, Node[][] _SplitChildren, int _NodeCapacity, int _MinNodeCapacity)

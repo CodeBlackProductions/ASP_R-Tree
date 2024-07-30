@@ -13,7 +13,7 @@ public class Inserter
         {
             InsertIntoLeaf(targetNode, leaf, insertData);
         }
-        else 
+        else
         {
             throw new InvalidOperationException("Invalid node while inserting into tree: " + targetNode);
         }
@@ -30,6 +30,11 @@ public class Inserter
         _Leaf.Data = newData;
 
         _Leaf.UpdateRect();
+
+        if (_LeafNode.Parent != null)
+        {
+            _LeafNode.Parent.Entry.UpdateRect();
+        }
 
         if (_LeafNode.IsOverflowing())
         {

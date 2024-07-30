@@ -6,6 +6,7 @@ public class DebugRTree : MonoBehaviour
 {
     [SerializeField] private GameObject m_PrefabObject;
     [SerializeField] private int m_NumberOfObjects;
+    [SerializeField] private bool m_UseFixedPositions;
     [SerializeField] private float m_PositionRangeMax;
     [SerializeField] private float m_PositionRangeMin;
     [SerializeField] private bool m_RemoveAfterInsert;
@@ -45,8 +46,16 @@ public class DebugRTree : MonoBehaviour
                 temp = new GameObject();
             }
 
-            temp.transform.position = new Vector3(Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax));
-            temp.transform.parent = gameObject.transform;
+            if (m_UseFixedPositions)
+            {
+                temp.transform.position = new Vector3(currentObjectCount, 0, currentObjectCount);
+                temp.transform.parent = gameObject.transform;
+            }
+            else
+            {
+                temp.transform.position = new Vector3(Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax), Random.Range(m_PositionRangeMin, m_PositionRangeMax));
+                temp.transform.parent = gameObject.transform;
+            }
 
             if (objController != null)
             {
@@ -62,6 +71,10 @@ public class DebugRTree : MonoBehaviour
                 doneInserting = true;
             }
             timer = 0.1f;
+        }
+        else if (doneInserting && currentObjectCount == m_NumberOfObjects) 
+        {
+            Debug.Log("Done Inserting");
         }
         else if (m_RemoveAfterInsert && timer <= 0 && doneInserting && currentObjectCount > 1)
         {
@@ -83,6 +96,11 @@ public class DebugRTree : MonoBehaviour
         else
         {
             timer -= Time.deltaTime;
+        }
+
+        if (timer <= 0 && currentObjectCount%100 == 1) 
+        {
+            Debug.Log(currentObjectCount);
         }
     }
 
