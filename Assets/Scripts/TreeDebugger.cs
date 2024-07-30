@@ -48,6 +48,11 @@ public class TreeDebugger : MonoBehaviour
 
     private void DrawNode(Node node)
     {
+        if (node == null || node.Entry == null) 
+        {
+            return;
+        }
+
         if (node.Entry is Leaf)
         {
             CreateCube(node, "Leaf");

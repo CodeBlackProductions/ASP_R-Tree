@@ -58,6 +58,65 @@ public class LeafSearch
         }
     }
 
+    public void StartSearch(Node _Root, int _EntryIndex, Rect _Range, out Leaf _Result)
+    {
+        IEnumerable<Node> nodes;
+
+        if (_Root.Entry is Branch branch)
+        {
+            nodes = branch.Children;
+        }
+        else
+        {
+            _Result = (Leaf)_Root.Entry;
+            return;
+        }
+
+        List<Leaf> intersectingLeaves = new List<Leaf>();
+        List<Leaf> nonIntersectingLeaves = new List<Leaf>();
+
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+        nodes.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
+        {
+            if (TreeScanner.Intersects(node.Entry.Rect, _Range))
+            {
+                List<Leaf> leaves = ScanRange(_Range, node, true);
+                lock (intersectingLeaves)
+                {
+                    intersectingLeaves.AddRange(leaves);
+                }
+            }
+            else
+            {
+                List<Leaf> leaves = ScanRange(_Range, node, false);
+                lock (nonIntersectingLeaves)
+                {
+                    nonIntersectingLeaves.AddRange(leaves);
+                }
+            }
+        });
+
+        if (intersectingLeaves.Count > 0)
+        {
+            Leaf result = null;
+            intersectingLeaves.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(leaf =>
+            {
+                for (int i = 0; i < leaf.EntryCount; i++)
+                {
+                    if (leaf.Data[i].ObjIDX == _EntryIndex)
+                    {
+                        result = leaf;
+                    }
+                }
+            });
+             
+            _Result = result;
+            return;
+        }
+
+        _Result = null;
+    }
+
     private List<Leaf> ScanRange(Rect _Range, Node _Start, bool _Intersecting)
     {
         List<Leaf> resultData = new List<Leaf>();

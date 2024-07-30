@@ -81,13 +81,13 @@ public class DebugRTree : MonoBehaviour
         }
         else if (m_RemoveAfterInsert && timer <= 0 && doneInserting && currentObjectCount > 1)
         {
-            tree.Remove(objects[objects.Count - 1]);
+            tree.Remove(objects[currentObjectCount - 1]);
             SceneView.RepaintAll();
             currentObjectCount--;
             GameObject temp = objects[objects.Count - 1];
             objects.Remove(temp);
             Destroy(temp);
-            timer = 1.0f;
+            timer = 0.1f;
         }
         else if (m_RandomizePositions && timer <= 0 && doneInserting)
         {

@@ -27,6 +27,13 @@ public class Branch : Spatial
 
     public override void UpdateRect()
     {
+        if (this.Children.Length == 0 || this.Children[0] == null)
+        {
+            Vector3 val = this.Rect.GetCenter();
+            this.Rect = new Rect(val, val);
+            return;
+        }
+
         float x = this.Children[0].Entry.Rect.LowerLeft.X;
         float y = this.Children[0].Entry.Rect.LowerLeft.Y;
         float z = this.Children[0].Entry.Rect.LowerLeft.Z;

@@ -14,7 +14,7 @@ public static class TreeScanner
         if (_Range.LowerLeft.X > _Range.UpperRight.X || _Range.LowerLeft.Y > _Range.UpperRight.Y)
         {
             throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X +
-                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X + 
+                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X +
                                                 " | " + _Range.UpperRight.Y);
         }
 
@@ -32,12 +32,30 @@ public static class TreeScanner
         if (_Range.LowerLeft.X > _Range.UpperRight.X || _Range.LowerLeft.Y > _Range.UpperRight.Y)
         {
             throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X +
-                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X + 
+                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X +
                                                 " | " + _Range.UpperRight.Y);
         }
 
         Leaf result;
         m_LeafSearcher.StartSearch(_Root, _Range, out result);
+        return result;
+    }
+
+    public static Leaf SearchLeaf(Node _Root, int _EntryIndex, Rect _Range)
+    {
+        if (_Root.Entry == null)
+        {
+            throw new InvalidOperationException("Empty Node while scanning R-Tree: " + _Root);
+        }
+        if (_Range.LowerLeft.X > _Range.UpperRight.X || _Range.LowerLeft.Y > _Range.UpperRight.Y)
+        {
+            throw new InvalidOperationException("Invalid Range for scanning R-Tree: " + _Range.LowerLeft.X +
+                                                " | " + _Range.LowerLeft.Y + " - " + _Range.UpperRight.X +
+                                                " | " + _Range.UpperRight.Y);
+        }
+
+        Leaf result;
+        m_LeafSearcher.StartSearch(_Root, _EntryIndex, _Range, out result);
         return result;
     }
 

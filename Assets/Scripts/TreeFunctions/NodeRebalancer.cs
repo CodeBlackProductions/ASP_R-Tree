@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 
 public class NodeRebalancer
 {
@@ -41,7 +44,7 @@ public class NodeRebalancer
 
                     sibling = targetParent.Children[i].Entry as Leaf;
 
-                    if ((sibling.EntryCount + amountToRedistribute) <= leaf.NodeCapacity)
+                    if ((sibling.EntryCount + amountToRedistribute) <= sibling.NodeCapacity)
                     {
                         redistributeLeaf = sibling;
                         break;
@@ -79,7 +82,7 @@ public class NodeRebalancer
 
                     Branch sibling = targetParent.Children[i].Entry as Branch;
 
-                    if ((sibling.EntryCount - amountToRedistribute) >= branch.MinNodeCapacity)
+                    if ((sibling.EntryCount + amountToRedistribute) <= sibling.NodeCapacity)
                     {
                         redistributeBranch = sibling;
                         break;
@@ -136,7 +139,7 @@ public class NodeRebalancer
 
                     sibling = targetParent.Children[i].Entry as Leaf;
 
-                    if ((sibling.EntryCount - amountToRedistribute) >= leaf.MinNodeCapacity)
+                    if ((sibling.EntryCount - amountToRedistribute) >= sibling.MinNodeCapacity)
                     {
                         redistributeLeaf = sibling;
                         break;
@@ -182,7 +185,7 @@ public class NodeRebalancer
 
                     Branch sibling = targetParent.Children[i].Entry as Branch;
 
-                    if ((sibling.EntryCount - amountToRedistribute) >= branch.MinNodeCapacity)
+                    if ((sibling.EntryCount - amountToRedistribute) >= sibling.MinNodeCapacity)
                     {
                         redistributeBranch = sibling;
                         break;
@@ -228,6 +231,8 @@ public class NodeRebalancer
 
         _PartnerLeaf.Data = newPartnerData;
         _PartnerLeaf.UpdateRect();
+
+        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
     private static void RedistributeUnderflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
@@ -241,12 +246,27 @@ public class NodeRebalancer
         Array.Copy(_PartnerBranch.Children, 0, newTargetData, _TargetBranch.EntryCount, _AmountToRedistribute);
 
         _TargetBranch.Children = newTargetData;
+
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+        _TargetBranch.Children.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
+        {
+            node.Parent = _TargetBranch.EncapsulatingNode;
+        });
+
         _TargetBranch.UpdateRect();
 
         Array.Copy(_PartnerBranch.Children, _AmountToRedistribute, newPartnerData, 0, _PartnerBranch.EntryCount - _AmountToRedistribute);
 
         _PartnerBranch.Children = newPartnerData;
+
+        _PartnerBranch.Children.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
+        {
+            node.Parent = _PartnerBranch.EncapsulatingNode;
+        });
+
         _PartnerBranch.UpdateRect();
+
+        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
     private static void RedistributeOverflowEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
@@ -266,6 +286,8 @@ public class NodeRebalancer
 
         _TargetLeaf.Data = newTargetData;
         _TargetLeaf.UpdateRect();
+
+        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
     private static void RedistributeOverflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
@@ -279,12 +301,27 @@ public class NodeRebalancer
         Array.Copy(_TargetBranch.Children, 0, newPartnerData, _PartnerBranch.EntryCount, _AmountToRedistribute);
 
         _PartnerBranch.Children = newPartnerData;
+
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+        _PartnerBranch.Children.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
+        {
+            node.Parent = _PartnerBranch.EncapsulatingNode;
+        });
+
         _PartnerBranch.UpdateRect();
 
         Array.Copy(_TargetBranch.Children, _AmountToRedistribute, newTargetData, 0, _TargetBranch.EntryCount - _AmountToRedistribute);
 
         _TargetBranch.Children = newTargetData;
+
+        _TargetBranch.Children.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
+        {
+            node.Parent = _TargetBranch.EncapsulatingNode;
+        });
+
         _TargetBranch.UpdateRect();
+
+        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
     private static void MergeNode(Leaf _TargetLeaf, Leaf _PartnerLeaf)
@@ -298,6 +335,8 @@ public class NodeRebalancer
 
         _PartnerLeaf.Data = null;
 
+        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
+
         Remover.RemoveNode(_PartnerLeaf.EncapsulatingNode);
     }
 
@@ -310,7 +349,15 @@ public class NodeRebalancer
 
         _TargetBranch.Children = mergedData;
 
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+        _TargetBranch.Children.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
+        {
+            node.Parent = _TargetBranch.EncapsulatingNode;
+        });
+
         _PartnerBranch.Children = null;
+
+        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
 
         Remover.RemoveNode(_PartnerBranch.EncapsulatingNode);
     }
