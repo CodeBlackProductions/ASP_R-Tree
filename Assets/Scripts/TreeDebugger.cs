@@ -31,11 +31,12 @@ public class TreeDebugger : MonoBehaviour
 
     public void DrawDebug(Node root)
     {
+
         if (EditorApplication.isPaused)
         {
             return;
         }
-        
+
 
         m_Root = root;
         if (!m_UseGizmos)

@@ -50,7 +50,7 @@ public class Remover
 
             if (leaf.EncapsulatingNode.IsUnderflowing())
             {
-                NodeRebalancer.RebalanceNodes(leaf.EncapsulatingNode);
+                NodeRebalancer.RebalanceUnderflowNodes(leaf.EncapsulatingNode);
             }
             
         }
@@ -104,7 +104,7 @@ public class Remover
 
             if (parent.EncapsulatingNode.IsUnderflowing())
             {
-                NodeRebalancer.RebalanceNodes(parent.EncapsulatingNode);
+                NodeRebalancer.RebalanceUnderflowNodes(parent.EncapsulatingNode);
             }
         }
     }

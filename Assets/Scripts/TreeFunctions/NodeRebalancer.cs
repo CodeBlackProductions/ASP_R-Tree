@@ -3,11 +3,114 @@ using System.Numerics;
 
 public class NodeRebalancer
 {
-    public static void RebalanceNodes(Node _TargetNode)
+    public static void RebalanceOverflowNodes(Node _TargetNode)
     {
         if (_TargetNode == null)
         {
             throw new ArgumentNullException("Node should not be Null when Rebalancing");
+        }
+
+        if (_TargetNode.Parent == null)
+        {
+            if (_TargetNode.IsOverflowing())
+            {
+                NodeSplitter.SplitNode(_TargetNode);
+            }
+            return;
+        }
+
+        Branch targetParent = _TargetNode.Parent.Entry as Branch;
+
+        if (_TargetNode.Entry is Leaf leaf)
+        {
+            if (targetParent.EntryCount > 1)
+            {
+                Leaf redistributeLeaf = null;
+                int amountToRedistribute = leaf.EntryCount - leaf.NodeCapacity;
+
+                Array.Sort(targetParent.Children, (a, b) => CompareProximity(leaf.Rect.GetCenter(), a, b));
+
+                Leaf sibling;
+
+                for (int i = 0; i < targetParent.EntryCount; i++)
+                {
+                    if (targetParent.Children[i].ID == _TargetNode.ID)
+                    {
+                        continue;
+                    }
+
+                    sibling = targetParent.Children[i].Entry as Leaf;
+
+                    if ((sibling.EntryCount + amountToRedistribute) <= leaf.NodeCapacity)
+                    {
+                        redistributeLeaf = sibling;
+                        break;
+                    }
+                }
+
+                if (redistributeLeaf != null)
+                {
+                    RedistributeOverflowEntries(leaf, redistributeLeaf, amountToRedistribute);
+                    return;
+                }
+                else
+                {
+                    NodeSplitter.SplitNode(_TargetNode);
+
+                    return;
+                }
+            }
+        }
+        else if (_TargetNode.Entry is Branch branch)
+        {
+            if (targetParent.EntryCount > 1)
+            {
+                Branch redistributeBranch = null;
+                int amountToRedistribute = branch.EntryCount - branch.NodeCapacity;
+
+                Array.Sort(targetParent.Children, (a, b) => CompareProximity(branch.Rect.GetCenter(), a, b));
+
+                for (int i = 0; i < targetParent.EntryCount; i++)
+                {
+                    if (targetParent.Children[i].ID == _TargetNode.ID)
+                    {
+                        continue;
+                    }
+
+                    Branch sibling = targetParent.Children[i].Entry as Branch;
+
+                    if ((sibling.EntryCount - amountToRedistribute) >= branch.MinNodeCapacity)
+                    {
+                        redistributeBranch = sibling;
+                        break;
+                    }
+                }
+
+                if (redistributeBranch != null)
+                {
+                    RedistributeOverflowEntries(branch, redistributeBranch, amountToRedistribute);
+                    return;
+                }
+                else
+                {
+                    NodeSplitter.SplitNode(_TargetNode);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void RebalanceUnderflowNodes(Node _TargetNode)
+    {
+        if (_TargetNode == null)
+        {
+            throw new ArgumentNullException("Node should not be Null when Rebalancing");
+        }
+
+        if (_TargetNode.Parent == null)
+        {
+            return;
         }
 
         Branch targetParent = _TargetNode.Parent.Entry as Branch;
@@ -22,14 +125,16 @@ public class NodeRebalancer
 
                 Array.Sort(targetParent.Children, (a, b) => CompareProximity(leaf.Rect.GetCenter(), a, b));
 
+                Leaf sibling;
+
                 for (int i = 0; i < targetParent.EntryCount; i++)
                 {
-                    if (targetParent.Children[i] == _TargetNode)
+                    if (targetParent.Children[i].ID == _TargetNode.ID)
                     {
                         continue;
                     }
 
-                    Leaf sibling = targetParent.Children[i].Entry as Leaf;
+                    sibling = targetParent.Children[i].Entry as Leaf;
 
                     if ((sibling.EntryCount - amountToRedistribute) >= leaf.MinNodeCapacity)
                     {
@@ -44,11 +149,17 @@ public class NodeRebalancer
 
                 if (redistributeLeaf != null)
                 {
-                    RedistributeEntries(leaf, redistributeLeaf, amountToRedistribute);
+                    RedistributeUnderflowEntries(leaf, redistributeLeaf, amountToRedistribute);
+                    return;
+                }
+                else if (mergeLeaf != null)
+                {
+                    MergeNode(leaf, mergeLeaf);
+                    return;
                 }
                 else
                 {
-                    MergeNode(leaf, mergeLeaf);
+                    return;
                 }
             }
         }
@@ -84,17 +195,23 @@ public class NodeRebalancer
 
                 if (redistributeBranch != null)
                 {
-                    RedistributeEntries(branch, redistributeBranch, amountToRedistribute);
+                    RedistributeUnderflowEntries(branch, redistributeBranch, amountToRedistribute);
+                    return;
+                }
+                else if (mergeBranch != null)
+                {
+                    MergeNode(branch, mergeBranch);
+                    return;
                 }
                 else
                 {
-                    MergeNode(branch, mergeBranch);
+                    return;
                 }
             }
         }
     }
 
-    private static void RedistributeEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
+    private static void RedistributeUnderflowEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
     {
         LeafData[] newTargetData = new LeafData[_TargetLeaf.EntryCount + _AmountToRedistribute];
         LeafData[] newPartnerData = new LeafData[_PartnerLeaf.EntryCount - _AmountToRedistribute];
@@ -113,7 +230,7 @@ public class NodeRebalancer
         _PartnerLeaf.UpdateRect();
     }
 
-    private static void RedistributeEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
+    private static void RedistributeUnderflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
     {
         Node[] newTargetData = new Node[_TargetBranch.EntryCount + _AmountToRedistribute];
         Node[] newPartnerData = new Node[_PartnerBranch.EntryCount - _AmountToRedistribute];
@@ -132,6 +249,44 @@ public class NodeRebalancer
         _PartnerBranch.UpdateRect();
     }
 
+    private static void RedistributeOverflowEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
+    {
+        LeafData[] newTargetData = new LeafData[_TargetLeaf.EntryCount - _AmountToRedistribute];
+        LeafData[] newPartnerData = new LeafData[_PartnerLeaf.EntryCount + _AmountToRedistribute];
+
+        Array.Sort(_TargetLeaf.Data, (a, b) => CompareProximity(_PartnerLeaf.Rect.GetCenter(), a, b));
+
+        Array.Copy(_PartnerLeaf.Data, 0, newPartnerData, 0, _PartnerLeaf.EntryCount);
+        Array.Copy(_TargetLeaf.Data, 0, newPartnerData, _PartnerLeaf.EntryCount, _AmountToRedistribute);
+
+        _PartnerLeaf.Data = newPartnerData;
+        _PartnerLeaf.UpdateRect();
+
+        Array.Copy(_TargetLeaf.Data, _AmountToRedistribute, newTargetData, 0, _TargetLeaf.EntryCount - _AmountToRedistribute);
+
+        _TargetLeaf.Data = newTargetData;
+        _TargetLeaf.UpdateRect();
+    }
+
+    private static void RedistributeOverflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
+    {
+        Node[] newTargetData = new Node[_TargetBranch.EntryCount - _AmountToRedistribute];
+        Node[] newPartnerData = new Node[_PartnerBranch.EntryCount + _AmountToRedistribute];
+
+        Array.Sort(_TargetBranch.Children, (a, b) => CompareProximity(_PartnerBranch.Rect.GetCenter(), a, b));
+
+        Array.Copy(_PartnerBranch.Children, 0, newPartnerData, 0, _PartnerBranch.EntryCount);
+        Array.Copy(_TargetBranch.Children, 0, newPartnerData, _PartnerBranch.EntryCount, _AmountToRedistribute);
+
+        _PartnerBranch.Children = newPartnerData;
+        _PartnerBranch.UpdateRect();
+
+        Array.Copy(_TargetBranch.Children, _AmountToRedistribute, newTargetData, 0, _TargetBranch.EntryCount - _AmountToRedistribute);
+
+        _TargetBranch.Children = newTargetData;
+        _TargetBranch.UpdateRect();
+    }
+
     private static void MergeNode(Leaf _TargetLeaf, Leaf _PartnerLeaf)
     {
         LeafData[] mergedData = new LeafData[_TargetLeaf.EntryCount + _PartnerLeaf.EntryCount];
@@ -140,6 +295,8 @@ public class NodeRebalancer
         Array.Copy(_PartnerLeaf.Data, 0, mergedData, _TargetLeaf.EntryCount, _PartnerLeaf.EntryCount);
 
         _TargetLeaf.Data = mergedData;
+
+        _PartnerLeaf.Data = null;
 
         Remover.RemoveNode(_PartnerLeaf.EncapsulatingNode);
     }
@@ -152,6 +309,8 @@ public class NodeRebalancer
         Array.Copy(_PartnerBranch.Children, 0, mergedData, _TargetBranch.EntryCount, _PartnerBranch.EntryCount);
 
         _TargetBranch.Children = mergedData;
+
+        _PartnerBranch.Children = null;
 
         Remover.RemoveNode(_PartnerBranch.EncapsulatingNode);
     }

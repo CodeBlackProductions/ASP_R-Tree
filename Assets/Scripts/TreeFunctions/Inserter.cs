@@ -38,7 +38,7 @@ public class Inserter
 
         if (_LeafNode.IsOverflowing())
         {
-            NodeSplitter.SplitNode(_LeafNode);
+            NodeRebalancer.RebalanceOverflowNodes(_LeafNode);
         }
     }
 

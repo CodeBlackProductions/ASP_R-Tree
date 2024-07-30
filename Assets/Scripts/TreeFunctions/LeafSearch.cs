@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 
 public class LeafSearch
 {
@@ -21,7 +23,8 @@ public class LeafSearch
         List<Leaf> intersectingLeaves = new List<Leaf>();
         List<Leaf> nonIntersectingLeaves = new List<Leaf>();
 
-        nodes.AsParallel().ForAll(node =>
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+        nodes.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
         {
             if (TreeScanner.Intersects(node.Entry.Rect, _Range))
             {

@@ -11,12 +11,14 @@ public class DebugRTree : MonoBehaviour
     [SerializeField] private float m_PositionRangeMin;
     [SerializeField] private bool m_RemoveAfterInsert;
     [SerializeField] private bool m_RandomizePositions;
+    [SerializeField] private bool m_UseDebugLog;
 
     private RTree tree;
     private Node root;
     private float timer = 0.1f;
     private int currentObjectCount = 0;
     private bool doneInserting = false;
+    private bool doneFlag = true;
 
     private List<GameObject> objects = new List<GameObject>();
 
@@ -72,9 +74,10 @@ public class DebugRTree : MonoBehaviour
             }
             timer = 0.1f;
         }
-        else if (doneInserting && currentObjectCount == m_NumberOfObjects) 
+        else if (doneInserting && currentObjectCount == m_NumberOfObjects && doneFlag)
         {
             Debug.Log("Done Inserting");
+            doneFlag = false;
         }
         else if (m_RemoveAfterInsert && timer <= 0 && doneInserting && currentObjectCount > 1)
         {
@@ -84,7 +87,7 @@ public class DebugRTree : MonoBehaviour
             GameObject temp = objects[objects.Count - 1];
             objects.Remove(temp);
             Destroy(temp);
-            timer = 0.1f;
+            timer = 1.0f;
         }
         else if (m_RandomizePositions && timer <= 0 && doneInserting)
         {
@@ -98,7 +101,7 @@ public class DebugRTree : MonoBehaviour
             timer -= Time.deltaTime;
         }
 
-        if (timer <= 0 && currentObjectCount%100 == 1) 
+        if (m_UseDebugLog && timer <= 0 && (currentObjectCount % 100 == 1 || currentObjectCount % 25 == 1))
         {
             Debug.Log(currentObjectCount);
         }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class LeafDataSearch
 {
@@ -24,7 +26,9 @@ public class LeafDataSearch
             }
         }
 
-        List<List<LeafData>> results = nodes.AsParallel()
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+
+        List<List<LeafData>> results = nodes.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism)
             .Where(node => TreeScanner.Intersects(node.Entry.Rect, _Range))
             .Select(node => ScanRange(_Range, node))
             .ToList();
@@ -56,6 +60,7 @@ public class LeafDataSearch
                         resultData.AddRange(((Leaf)child.Entry).Data);
                     }
                 }
+
             }
         }
         else if (_Start.Entry is Leaf)
