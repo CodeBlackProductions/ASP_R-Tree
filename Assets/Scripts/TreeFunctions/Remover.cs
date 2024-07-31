@@ -55,7 +55,7 @@ public class Remover
         else
         {
             leaf.UpdateRect();
-            leaf.EncapsulatingNode.Parent.Entry.UpdateRect();
+            leaf.EncapsulatingNode.Parent.Entry.UpdateRect(leaf.Rect.LowerLeft, leaf.Rect.UpperRight);
 
             if (leaf.EncapsulatingNode.IsUnderflowing())
             {
@@ -117,7 +117,7 @@ public class Remover
             else
             {
                 parent.UpdateRect();
-                parent.EncapsulatingNode.Parent.Entry.UpdateRect();
+                parent.EncapsulatingNode.Parent.Entry.UpdateRect(parent.Rect.LowerLeft,parent.Rect.UpperRight);
 
                 if (parent.EncapsulatingNode.IsUnderflowing())
                 {

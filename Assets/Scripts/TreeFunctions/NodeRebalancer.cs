@@ -232,7 +232,7 @@ public class NodeRebalancer
         _PartnerLeaf.Data = newPartnerData;
         _PartnerLeaf.UpdateRect();
 
-        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
+        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect(_TargetLeaf.Rect.LowerLeft,_TargetLeaf.Rect.UpperRight);
     }
 
     private static void RedistributeUnderflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
@@ -266,7 +266,7 @@ public class NodeRebalancer
 
         _PartnerBranch.UpdateRect();
 
-        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
+        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect(_TargetBranch.Rect.LowerLeft, _TargetBranch.Rect.UpperRight);
     }
 
     private static void RedistributeOverflowEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
@@ -287,7 +287,7 @@ public class NodeRebalancer
         _TargetLeaf.Data = newTargetData;
         _TargetLeaf.UpdateRect();
 
-        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
+        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect(_TargetLeaf.Rect.LowerLeft, _TargetLeaf.Rect.UpperRight);
     }
 
     private static void RedistributeOverflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
@@ -321,7 +321,7 @@ public class NodeRebalancer
 
         _TargetBranch.UpdateRect();
 
-        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
+        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect(_TargetBranch.Rect.LowerLeft, _TargetBranch.Rect.UpperRight);
     }
 
     private static void MergeNode(Leaf _TargetLeaf, Leaf _PartnerLeaf)
@@ -335,7 +335,7 @@ public class NodeRebalancer
 
         _PartnerLeaf.Data = null;
 
-        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
+        _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect(_TargetLeaf.Rect.LowerLeft, _TargetLeaf.Rect.UpperRight);
 
         Remover.RemoveNode(_PartnerLeaf.EncapsulatingNode);
     }
@@ -357,7 +357,7 @@ public class NodeRebalancer
 
         _PartnerBranch.Children = null;
 
-        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
+        _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect(_TargetBranch.Rect.LowerLeft, _TargetBranch.Rect.UpperRight);
 
         Remover.RemoveNode(_PartnerBranch.EncapsulatingNode);
     }

@@ -34,17 +34,8 @@ public class Branch : Spatial
             return;
         }
 
-        float x = this.Children[0].Entry.Rect.LowerLeft.X;
-        float y = this.Children[0].Entry.Rect.LowerLeft.Y;
-        float z = this.Children[0].Entry.Rect.LowerLeft.Z;
-
-        Vector3 lowerLeft = new Vector3(x, y, z);
-
-        x = this.Children[0].Entry.Rect.UpperRight.X;
-        y = this.Children[0].Entry.Rect.UpperRight.Y;
-        z = this.Children[0].Entry.Rect.UpperRight.Z;
-
-        Vector3 upperRight = new Vector3(x, y, z);
+        Vector3 lowerLeft = m_Rect.LowerLeft;
+        Vector3 upperRight = m_Rect.UpperRight;
 
         for (int i = 0; i < this.Children.Length; i++)
         {
@@ -57,6 +48,24 @@ public class Branch : Spatial
             upperRight.Z = Math.Max(upperRight.Z, this.Children[i].Entry.Rect.UpperRight.Z);
         }
 
-        this.Rect = new Rect(lowerLeft, upperRight);
+        this.Rect.LowerLeft = lowerLeft;
+        this.Rect.UpperRight = upperRight;
+    }
+
+    public override void UpdateRect(Vector3 _ChildLowerleft, Vector3 _ChildUpperRight)
+    {
+        Vector3 lowerLeft = m_Rect.LowerLeft;
+        Vector3 upperRight = m_Rect.UpperRight;
+
+        lowerLeft.X = Math.Min(lowerLeft.X, _ChildLowerleft.X);
+        lowerLeft.Y = Math.Min(lowerLeft.Y, _ChildLowerleft.Y);
+        lowerLeft.Z = Math.Min(lowerLeft.Z, _ChildLowerleft.Z);
+
+        upperRight.X = Math.Max(upperRight.X, _ChildUpperRight.X);
+        upperRight.Y = Math.Max(upperRight.Y, _ChildUpperRight.Y);
+        upperRight.Z = Math.Max(upperRight.Z, _ChildUpperRight.Z);
+
+        this.Rect.LowerLeft = lowerLeft;
+        this.Rect.UpperRight = upperRight;
     }
 }

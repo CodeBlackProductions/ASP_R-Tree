@@ -508,12 +508,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PrefabObject: {fileID: 7985898435330551894, guid: 7ca39a5a8501b814ea18105dc394095b,
     type: 3}
-  m_NumberOfObjects: 100
-  m_UseFixedPositions: 0
+  m_NumberOfObjects: 200
+  m_UseFixedPositions: 1
   m_PositionRangeMax: 20
   m_PositionRangeMin: 0
-  m_RemoveAfterInsert: 0
-  m_RandomizePositions: 1
+  m_RemoveAfterInsert: 1
+  m_RandomizePositions: 0
   m_UseDebugLog: 1
 --- !u!4 &1570001093
 Transform:

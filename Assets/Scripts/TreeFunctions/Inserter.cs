@@ -33,7 +33,7 @@ public class Inserter
 
         if (_LeafNode.Parent != null)
         {
-            _LeafNode.Parent.Entry.UpdateRect();
+            _LeafNode.Parent.Entry.UpdateRect(_Leaf.Rect.LowerLeft, _Leaf.Rect.UpperRight);
         }
 
         if (_LeafNode.IsOverflowing())
