@@ -12,7 +12,7 @@ public class Remover
 
         if (leaf == null) 
         {
-            throw new Exception("Leaf should not be Null when removing Entry!");
+            throw new Exception("Leaf should not be Null when removing Entry! " + _Index + " " + _Pos);
         }
 
         LeafData[] newData = new LeafData[leaf.Data.Length - 1];

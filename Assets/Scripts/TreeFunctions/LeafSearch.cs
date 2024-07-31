@@ -73,7 +73,6 @@ public class LeafSearch
         }
 
         List<Leaf> intersectingLeaves = new List<Leaf>();
-        List<Leaf> nonIntersectingLeaves = new List<Leaf>();
 
         ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
         nodes.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
@@ -86,19 +85,12 @@ public class LeafSearch
                     intersectingLeaves.AddRange(leaves);
                 }
             }
-            else
-            {
-                List<Leaf> leaves = ScanRange(_Range, node, false);
-                lock (nonIntersectingLeaves)
-                {
-                    nonIntersectingLeaves.AddRange(leaves);
-                }
-            }
         });
 
         if (intersectingLeaves.Count > 0)
         {
             Leaf result = null;
+
             intersectingLeaves.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(leaf =>
             {
                 for (int i = 0; i < leaf.EntryCount; i++)
@@ -109,7 +101,7 @@ public class LeafSearch
                     }
                 }
             });
-             
+
             _Result = result;
             return;
         }
