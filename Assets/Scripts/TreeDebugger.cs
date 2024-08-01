@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,7 +15,6 @@ public class TreeDebugger : MonoBehaviour
     private Dictionary<Node, GameObject> cubeMap = new Dictionary<Node, GameObject>();
     private Node m_Root;
 
-
     private void Awake()
     {
         if (Instance == null)
@@ -31,12 +29,10 @@ public class TreeDebugger : MonoBehaviour
 
     public void DrawDebug(Node root)
     {
-
         if (EditorApplication.isPaused)
         {
             return;
         }
-
 
         m_Root = root;
         if (!m_UseGizmos)
@@ -48,7 +44,7 @@ public class TreeDebugger : MonoBehaviour
 
     private void DrawNode(Node node)
     {
-        if (node == null || node.Entry == null) 
+        if (node == null || node.Entry == null)
         {
             return;
         }
@@ -85,7 +81,7 @@ public class TreeDebugger : MonoBehaviour
             {
                 Gizmos.color = Color.green;
             }
-            if (node == m_Root) 
+            if (node == m_Root)
             {
                 Gizmos.color = Color.red;
             }

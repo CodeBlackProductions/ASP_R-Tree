@@ -82,11 +82,13 @@ public class NodeSplitter
     public static void PrepareRootSplit(Node _NodeToSplit)
     {
         Node newRoot = new Node(_NodeToSplit.Level + 1,
-                                new Branch(_NodeToSplit, _NodeToSplit.Entry.Rect, new Node[] { _NodeToSplit }, _NodeToSplit.Entry.NodeCapacity, _NodeToSplit.Entry.MinNodeCapacity),
-                                _NodeToSplit, _NodeToSplit.ParentTree);
+                                new Branch(null, _NodeToSplit.Entry.Rect, new Node[] { _NodeToSplit }, _NodeToSplit.Entry.NodeCapacity, _NodeToSplit.Entry.MinNodeCapacity),
+                                null, _NodeToSplit.ParentTree);
 
-        _NodeToSplit.Parent = newRoot;
+        newRoot.Entry.EncapsulatingNode = newRoot;
+
         _NodeToSplit.ParentTree.Root = newRoot;
+        _NodeToSplit.Parent = newRoot;
     }
 
     #region Methods for the actual split

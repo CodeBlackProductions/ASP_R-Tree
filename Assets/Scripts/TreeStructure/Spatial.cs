@@ -13,5 +13,4 @@ public abstract class Spatial
     public abstract int MinNodeCapacity { get; }
 
     public abstract void UpdateRect();
-    public virtual void UpdateRect(Vector3 _ChildLowerleft, Vector3 _ChildUpperRight) { }
 }

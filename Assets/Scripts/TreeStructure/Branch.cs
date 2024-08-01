@@ -34,8 +34,8 @@ public class Branch : Spatial
             return;
         }
 
-        Vector3 lowerLeft = m_Rect.LowerLeft;
-        Vector3 upperRight = m_Rect.UpperRight;
+        Vector3 lowerLeft = this.Children[0].Entry.Rect.LowerLeft;
+        Vector3 upperRight = this.Children[0].Entry.Rect.UpperRight;
 
         for (int i = 0; i < this.Children.Length; i++)
         {
@@ -50,22 +50,10 @@ public class Branch : Spatial
 
         this.Rect.LowerLeft = lowerLeft;
         this.Rect.UpperRight = upperRight;
-    }
 
-    public override void UpdateRect(Vector3 _ChildLowerleft, Vector3 _ChildUpperRight)
-    {
-        Vector3 lowerLeft = m_Rect.LowerLeft;
-        Vector3 upperRight = m_Rect.UpperRight;
-
-        lowerLeft.X = Math.Min(lowerLeft.X, _ChildLowerleft.X);
-        lowerLeft.Y = Math.Min(lowerLeft.Y, _ChildLowerleft.Y);
-        lowerLeft.Z = Math.Min(lowerLeft.Z, _ChildLowerleft.Z);
-
-        upperRight.X = Math.Max(upperRight.X, _ChildUpperRight.X);
-        upperRight.Y = Math.Max(upperRight.Y, _ChildUpperRight.Y);
-        upperRight.Z = Math.Max(upperRight.Z, _ChildUpperRight.Z);
-
-        this.Rect.LowerLeft = lowerLeft;
-        this.Rect.UpperRight = upperRight;
+        if (m_EncapsulatingNode != null && m_EncapsulatingNode.Parent != null)
+        {
+            m_EncapsulatingNode.Parent.Entry.UpdateRect();
+        }
     }
 }

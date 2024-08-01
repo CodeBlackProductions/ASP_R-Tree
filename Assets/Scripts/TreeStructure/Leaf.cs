@@ -25,11 +25,15 @@ public class Leaf : Spatial
         m_MinNodeCapacity = _MinCapacity;
     }
 
-
     public override void UpdateRect()
     {
-        Vector3 lowerLeft = m_Rect.LowerLeft;
-        Vector3 upperRight = m_Rect.UpperRight;
+        float x = this.Data[0].PosX;
+        float y = this.Data[0].PosY;
+        float z = this.Data[0].PosZ;
+
+        Vector3 lowerLeft = new Vector3(x, y, z);
+
+        Vector3 upperRight = new Vector3(x, y, z);
 
         for (int i = 0; i < this.Data.Length; i++)
         {
@@ -41,23 +45,6 @@ public class Leaf : Spatial
             upperRight.Y = Math.Max(upperRight.Y, this.Data[i].PosY);
             upperRight.Z = Math.Max(upperRight.Z, this.Data[i].PosZ);
         }
-
-        this.Rect.LowerLeft = lowerLeft;
-        this.Rect.UpperRight = upperRight;
-    }
-
-    public override void UpdateRect(Vector3 _ChildLowerleft, Vector3 _ChildUpperRight)
-    {
-        Vector3 lowerLeft = m_Rect.LowerLeft;
-        Vector3 upperRight = m_Rect.UpperRight;
-
-        lowerLeft.X = Math.Min(lowerLeft.X, _ChildLowerleft.X);
-        lowerLeft.Y = Math.Min(lowerLeft.Y, _ChildLowerleft.Y);
-        lowerLeft.Z = Math.Min(lowerLeft.Z, _ChildLowerleft.Z);
-
-        upperRight.X = Math.Max(upperRight.X, _ChildUpperRight.X);
-        upperRight.Y = Math.Max(upperRight.Y, _ChildUpperRight.Y);
-        upperRight.Z = Math.Max(upperRight.Z, _ChildUpperRight.Z);
 
         this.Rect.LowerLeft = lowerLeft;
         this.Rect.UpperRight = upperRight;

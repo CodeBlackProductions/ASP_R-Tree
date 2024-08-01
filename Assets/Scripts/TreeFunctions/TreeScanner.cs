@@ -62,9 +62,9 @@ public static class TreeScanner
     public static bool Intersects(Rect A, Rect B)
     {
         return (
-                    (A.UpperRight.X > B.LowerLeft.X || B.UpperRight.X > A.LowerLeft.X) &&
-                    (A.UpperRight.Y > B.LowerLeft.Y || B.UpperRight.Y > A.LowerLeft.Y) &&
-                    (A.UpperRight.Z > B.LowerLeft.Z || B.UpperRight.Z > A.LowerLeft.Z)
+                    (A.UpperRight.X >= B.UpperRight.X || B.LowerLeft.X >= A.LowerLeft.X) &&
+                    (A.UpperRight.Y >= B.UpperRight.Y || B.LowerLeft.Y >= A.LowerLeft.Y) &&
+                    (A.UpperRight.Z >= B.UpperRight.Z || B.LowerLeft.Z >= A.LowerLeft.Z)
                 );
     }
 }

@@ -24,7 +24,7 @@ public class DebugRTree : MonoBehaviour
 
     private void Awake()
     {
-        root = new Node(0, new Leaf(root, new Rect(new System.Numerics.Vector3(0, 0, 0), new System.Numerics.Vector3(1, 1, 1)), new LeafData[0], 10, 5), root, null);
+        root = new Node(0, new Leaf(null, new Rect(new System.Numerics.Vector3(0, 0, 0), new System.Numerics.Vector3(1, 1, 1)), new LeafData[0], 10, 5), null, null);
         root.Entry.EncapsulatingNode = root;
         tree = new RTree(root, 10, 5);
         root.ParentTree = tree;

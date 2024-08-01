@@ -6,18 +6,18 @@ public class Remover
 {
     public static void RemoveEntry(Node _Root, int _Index, Vector3 _Pos)
     {
-        Rect range = new Rect(_Pos, _Pos);
+        Rect range = new Rect(_Pos, _Pos * 2);
 
         Leaf leaf = TreeScanner.SearchLeaf(_Root, _Index, range);
 
-        if (leaf == null) 
+        if (leaf == null)
         {
             throw new Exception("Leaf should not be Null when removing Entry! " + _Index + " " + _Pos);
         }
 
         LeafData[] newData = new LeafData[leaf.Data.Length - 1];
 
-        if (newData.Length > 1)
+        if (newData.Length > 0)
         {
             int targetIndex = -1;
             for (int i = 0; i < leaf.Data.Length; i++)
@@ -55,7 +55,11 @@ public class Remover
         else
         {
             leaf.UpdateRect();
-            leaf.EncapsulatingNode.Parent.Entry.UpdateRect(leaf.Rect.LowerLeft, leaf.Rect.UpperRight);
+
+            if (leaf.EncapsulatingNode.Parent != null)
+            {
+                leaf.EncapsulatingNode.Parent.Entry.UpdateRect();
+            }
 
             if (leaf.EncapsulatingNode.IsUnderflowing())
             {
@@ -79,7 +83,7 @@ public class Remover
 
             Node[] newData = new Node[parent.Children.Length - 1];
 
-            if (newData.Length > 1)
+            if (newData.Length > 0)
             {
                 int targetIndex = -1;
                 for (int i = 0; i < parent.Children.Length; i++)
@@ -117,7 +121,12 @@ public class Remover
             else
             {
                 parent.UpdateRect();
-                parent.EncapsulatingNode.Parent.Entry.UpdateRect(parent.Rect.LowerLeft,parent.Rect.UpperRight);
+
+                if (parent.EncapsulatingNode.Parent != null) 
+                {
+                    parent.EncapsulatingNode.Parent.Entry.UpdateRect();
+                }
+                
 
                 if (parent.EncapsulatingNode.IsUnderflowing())
                 {
