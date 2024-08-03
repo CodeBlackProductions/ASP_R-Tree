@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Threading.Tasks;
 
@@ -26,21 +27,16 @@ public class LeafSearch
         ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
         nodes.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
         {
-            if (TreeScanner.Intersects(node.Entry.Rect, _Range))
+            List<Leaf> leaves = ScanRange(_Range, node, true);
+            lock (intersectingLeaves)
             {
-                List<Leaf> leaves = ScanRange(_Range, node, true);
-                lock (intersectingLeaves)
-                {
-                    intersectingLeaves.AddRange(leaves);
-                }
+                intersectingLeaves.AddRange(leaves);
             }
-            else
+
+            leaves = ScanRange(_Range, node, false);
+            lock (nonIntersectingLeaves)
             {
-                List<Leaf> leaves = ScanRange(_Range, node, false);
-                lock (nonIntersectingLeaves)
-                {
-                    nonIntersectingLeaves.AddRange(leaves);
-                }
+                nonIntersectingLeaves.AddRange(leaves);
             }
         });
 
@@ -51,10 +47,14 @@ public class LeafSearch
             _Result = intersectingLeaves.OrderBy(leaf =>
             Vector3.DistanceSquared(rangeCenter, leaf.Rect.GetCenter())).First();
         }
-        else
+        else if (nonIntersectingLeaves.Count > 0)
         {
             _Result = nonIntersectingLeaves.OrderBy(leaf =>
              Vector3.DistanceSquared(rangeCenter, leaf.Rect.GetCenter())).First();
+        }
+        else
+        {
+            _Result = null;
         }
     }
 
@@ -77,13 +77,10 @@ public class LeafSearch
         ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
         nodes.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(node =>
         {
-            if (TreeScanner.Intersects(node.Entry.Rect, _Range))
+            List<Leaf> leaves = ScanRange(_Range, node, true, _EntryIndex);
+            lock (intersectingLeaves)
             {
-                List<Leaf> leaves = ScanRange(_Range, node, true);
-                lock (intersectingLeaves)
-                {
-                    intersectingLeaves.AddRange(leaves);
-                }
+                intersectingLeaves.AddRange(leaves);
             }
         });
 
@@ -93,6 +90,10 @@ public class LeafSearch
 
             intersectingLeaves.AsParallel().WithDegreeOfParallelism(parallelOptions.MaxDegreeOfParallelism).ForAll(leaf =>
             {
+                if (leaf == null)
+                {
+                    return;
+                }
                 for (int i = 0; i < leaf.EntryCount; i++)
                 {
                     if (leaf.Data[i].ObjIDX == _EntryIndex)
@@ -120,17 +121,14 @@ public class LeafSearch
             {
                 if (_Intersecting)
                 {
-                    if (TreeScanner.Intersects(child.Entry.Rect, _Range))
+                    if (child.Entry is Branch)
                     {
-                        if (child.Entry is Branch)
-                        {
-                            StartSearch(child, _Range, out result);
-                            resultData.Add(result);
-                        }
-                        else if (child.Entry is Leaf leaf)
-                        {
-                            resultData.Add(leaf);
-                        }
+                        StartSearch(child, _Range, out result);
+                        resultData.Add(result);
+                    }
+                    else if (child.Entry is Leaf leaf && TreeScanner.Intersects(child.Entry.Rect, _Range))
+                    {
+                        resultData.Add(leaf);
                     }
                 }
                 else
@@ -138,6 +136,49 @@ public class LeafSearch
                     if (child.Entry is Branch)
                     {
                         StartSearch(child, _Range, out result);
+                        resultData.Add(result);
+                    }
+                    else if (child.Entry is Leaf leaf)
+                    {
+                        resultData.Add(leaf);
+                    }
+                }
+            }
+        }
+        else if (_Start.Entry is Leaf leaf)
+        {
+            resultData.Add(leaf);
+        }
+
+        return resultData;
+    }
+
+    private List<Leaf> ScanRange(Rect _Range, Node _Start, bool _Intersecting, int _EntryIndex)
+    {
+        List<Leaf> resultData = new List<Leaf>();
+
+        if (_Start.Entry is Branch branch)
+        {
+            Leaf result;
+            foreach (Node child in branch.Children)
+            {
+                if (_Intersecting)
+                {
+                    if (child.Entry is Branch)
+                    {
+                        StartSearch(child, _EntryIndex, _Range, out result);
+                        resultData.Add(result);
+                    }
+                    else if (child.Entry is Leaf leaf && TreeScanner.Intersects(child.Entry.Rect, _Range))
+                    {
+                        resultData.Add(leaf);
+                    }
+                }
+                else
+                {
+                    if (child.Entry is Branch)
+                    {
+                        StartSearch(child, _EntryIndex, _Range, out result);
                         resultData.Add(result);
                     }
                     else if (child.Entry is Leaf leaf)

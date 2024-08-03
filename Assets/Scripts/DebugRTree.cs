@@ -6,6 +6,7 @@ public class DebugRTree : MonoBehaviour
 {
     [SerializeField] private GameObject m_PrefabObject;
     [SerializeField] private int m_NumberOfObjects;
+    [SerializeField] private float m_DelayTime = 0.1f;
     [SerializeField] private bool m_UseFixedPositions;
     [SerializeField] private float m_PositionRangeMax;
     [SerializeField] private float m_PositionRangeMin;
@@ -15,7 +16,7 @@ public class DebugRTree : MonoBehaviour
 
     private RTree tree;
     private Node root;
-    private float timer = 0.1f;
+    private float timer;
     private int currentObjectCount = 0;
     private bool doneInserting = false;
     private bool doneFlag = true;
@@ -48,6 +49,8 @@ public class DebugRTree : MonoBehaviour
                 temp = new GameObject();
             }
 
+            temp.name = temp.name + Time.time;
+
             if (m_UseFixedPositions)
             {
                 temp.transform.position = new Vector3(currentObjectCount, 0, currentObjectCount);
@@ -72,7 +75,7 @@ public class DebugRTree : MonoBehaviour
             {
                 doneInserting = true;
             }
-            timer = 0.1f;
+            timer = m_DelayTime;
         }
         else if (doneInserting && currentObjectCount == m_NumberOfObjects && doneFlag)
         {
@@ -87,7 +90,7 @@ public class DebugRTree : MonoBehaviour
             GameObject temp = objects[objects.Count - 1];
             objects.Remove(temp);
             Destroy(temp);
-            timer = 0.1f;
+            timer = m_DelayTime;
         }
         else if (m_RandomizePositions && timer <= 0 && doneInserting)
         {
@@ -95,6 +98,7 @@ public class DebugRTree : MonoBehaviour
             float newY = Random.Range(m_PositionRangeMin, m_PositionRangeMax);
             float newZ = Random.Range(m_PositionRangeMin, m_PositionRangeMax);
             objects[Random.Range(0, objects.Count - 1)].gameObject.transform.position = new Vector3(newX, newY, newZ);
+            timer = m_DelayTime;
         }
         else
         {

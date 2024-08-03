@@ -9,6 +9,11 @@ public class Inserter
 
         Node targetNode = ChooseTargetNode(_Root, new Vector3(_PosX, _PosY, _PosZ));
 
+        if (targetNode == null)
+        {
+            throw new Exception("targetNode should not be Null when Inserting!");
+        }
+
         if (targetNode.Entry is Leaf leaf)
         {
             InsertIntoLeaf(targetNode, leaf, insertData);
@@ -44,6 +49,11 @@ public class Inserter
 
     private static Node ChooseTargetNode(Node _Root, Vector3 _ObjPos)
     {
-        return TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos)).EncapsulatingNode;
+        Leaf result = TreeScanner.SearchLeaf(_Root, new Rect(_ObjPos, _ObjPos));
+        if (result == null)
+        {
+            return null;
+        }
+        return result.EncapsulatingNode;
     }
 }

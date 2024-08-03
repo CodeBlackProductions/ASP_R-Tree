@@ -6,7 +6,7 @@ public class Remover
 {
     public static void RemoveEntry(Node _Root, int _Index, Vector3 _Pos)
     {
-        Rect range = new Rect(_Pos, _Pos * 2);
+        Rect range = new Rect(_Pos, _Pos);
 
         Leaf leaf = TreeScanner.SearchLeaf(_Root, _Index, range);
 

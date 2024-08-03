@@ -28,6 +28,7 @@ public class RTree
     {
         m_GameObjects.Add(m_IndexCounter, _Obj);
         m_Indices.Add(_Obj, m_IndexCounter);
+        m_IndexCounter++;
 
         Vector3 pos = new Vector3(_Obj.transform.position.x, _Obj.transform.position.y, _Obj.transform.position.z);
 
@@ -43,8 +44,6 @@ public class RTree
         }
 
         Inserter.InsertData(m_Root, m_IndexCounter, pos.X, pos.Y, pos.Z);
-
-        m_IndexCounter++;
     }
 
     public void Remove(UnityEngine.GameObject _Obj)
