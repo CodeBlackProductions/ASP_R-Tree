@@ -1,5 +1,8 @@
 using System;
 
+/// <summary>
+/// Structural class. Contains either branches or leafs. Each node has a unique ID for identification.
+/// </summary>
 public class Node
 {
     private Spatial m_Entry;
@@ -38,6 +41,10 @@ public class Node
         m_ID = Guid.NewGuid();
     }
 
+    /// <summary>
+    /// Checks if the node contains too many entries.
+    /// </summary>
+    /// <returns>is true, if node has too many entries.</returns>
     public bool IsOverflowing()
     {
         if (m_Entry.EntryCount > m_Entry.NodeCapacity)
@@ -50,6 +57,10 @@ public class Node
         }
     }
 
+    /// <summary>
+    /// Checks if the node contains not enough entries to be efficient.
+    /// </summary>
+    /// <returns>Returns true if there are not enough entries in the node.</returns>
     public bool IsUnderflowing()
     {
         if (m_Entry.EntryCount < m_Entry.MinNodeCapacity)

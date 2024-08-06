@@ -1,6 +1,9 @@
 using System;
 using System.Numerics;
 
+/// <summary>
+/// A type of node entry. Contains the actual object data.
+/// </summary>
 public class Leaf : Spatial
 {
     private Node m_EncapsulatingNode;
@@ -16,15 +19,18 @@ public class Leaf : Spatial
     public override int NodeCapacity { get => m_NodeCapacity; }
     public override int MinNodeCapacity { get => m_MinNodeCapacity; }
 
-    public Leaf(Node _Parent, Rect _Rect, LeafData[] _Data, int _MaxCapacity, int _MinCapacity)
+    public Leaf(Node _EncapsulatingNode, Rect _Rect, LeafData[] _Data, int _MaxCapacity, int _MinCapacity)
     {
-        m_EncapsulatingNode = _Parent;
+        m_EncapsulatingNode = _EncapsulatingNode;
         m_Rect = _Rect;
         m_Data = _Data;
         m_NodeCapacity = _MaxCapacity;
         m_MinNodeCapacity = _MinCapacity;
     }
 
+    /// <summary>
+    /// Updates the rectangle of the node based on the contained children.
+    /// </summary>
     public override void UpdateRect()
     {
         float x = this.Data[0].PosX;

@@ -1,3 +1,6 @@
+/// <summary>
+/// Contains the position and index of one single object inside the tree.
+/// </summary>
 public struct LeafData
 {
     private readonly int objIDX;

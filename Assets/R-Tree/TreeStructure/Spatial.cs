@@ -1,5 +1,6 @@
-using System.Numerics;
-
+/// <summary>
+/// Base class for branch and leaf.
+/// </summary>
 public abstract class Spatial
 {
     public abstract Node EncapsulatingNode { get; set; }

@@ -1,6 +1,9 @@
 using System;
 using System.Numerics;
 
+/// <summary>
+/// A type of node entry. Contains other nodes as children.
+/// </summary>
 public class Branch : Spatial
 {
     private Node m_EncapsulatingNode;
@@ -16,15 +19,18 @@ public class Branch : Spatial
     public override int NodeCapacity { get => m_NodeCapacity; }
     public override int MinNodeCapacity { get => m_MinNodeCapacity; }
 
-    public Branch(Node _Parent, Rect _Rect, Node[] _Children, int _MaxCapacity, int _MinCapacity)
+    public Branch(Node _EncapsulatingNode, Rect _Rect, Node[] _Children, int _MaxCapacity, int _MinCapacity)
     {
-        m_EncapsulatingNode = _Parent;
+        m_EncapsulatingNode = _EncapsulatingNode;
         m_Rect = _Rect;
         m_Children = _Children;
         m_NodeCapacity = _MaxCapacity;
         m_MinNodeCapacity = _MinCapacity;
     }
 
+    /// <summary>
+    /// Updates the rectangle of the node based on the contained children.
+    /// </summary>
     public override void UpdateRect()
     {
         if (this.Children.Length == 0 || this.Children[0] == null)

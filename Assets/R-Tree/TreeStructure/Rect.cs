@@ -1,5 +1,8 @@
 ﻿using System.Numerics;
 
+/// <summary>
+/// Contains coordinates to define the area a node encapsulates.
+/// </summary>
 public class Rect
 {
     private Vector3 lowerLeft;
@@ -14,6 +17,10 @@ public class Rect
         upperRight = _UpperRight;
     }
 
+    /// <summary>
+    /// Calculates the center of the rectangle
+    /// </summary>
+    /// <returns>The center vector of the rectangle</returns>
     public Vector3 GetCenter()
     {
         return (lowerLeft + upperRight) * 0.5f;

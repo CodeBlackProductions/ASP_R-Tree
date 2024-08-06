@@ -3,8 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Searches for object data packages inside the tree.
+/// </summary>
 public class LeafDataSearch
 {
+    /// <summary>
+    /// Searches for objects within the specified area.
+    /// </summary>
+    /// <param name="_Root">Root node of the tree</param>
+    /// <param name="_Range">The area to search for objects in</param>
+    /// <param name="_Result">The Objects found within the specified area</param>
     public void StartSearch(Node _Root, Rect _Range, out LeafData[] _Result)
     {
         IEnumerable<Node> nodes;
@@ -38,6 +47,12 @@ public class LeafDataSearch
         _Result = combinedResults.ToArray();
     }
 
+    /// <summary>
+    /// Used for recursively scanning the entire tree.
+    /// </summary>
+    /// <param name="_Range">The area to search for objects in</param>
+    /// <param name="_Start">The node to start searching from</param>
+    /// <returns>The Objects found within the specified area</returns>
     private List<LeafData> ScanRange(Rect _Range, Node _Start)
     {
         List<LeafData> resultData = new List<LeafData>();

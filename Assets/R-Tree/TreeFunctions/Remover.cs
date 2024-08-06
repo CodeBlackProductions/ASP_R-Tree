@@ -4,6 +4,13 @@ using System.Numerics;
 
 public class Remover
 {
+    /// <summary>
+    /// Removes an object from the tree.
+    /// </summary>
+    /// <param name="_Root">Root of the tree</param>
+    /// <param name="_Index">Index of the object to remove</param>
+    /// <param name="_Pos">Current tree position of the object to remove</param>
+    /// <exception cref="Exception"></exception>
     public static void RemoveEntry(Node _Root, int _Index, Vector3 _Pos)
     {
         Rect range = new Rect(_Pos, _Pos);
@@ -68,6 +75,11 @@ public class Remover
         }
     }
 
+    /// <summary>
+    /// Removes a node from the tree.
+    /// </summary>
+    /// <param name="_NodeToRemove">The node that should be removed</param>
+    /// <exception cref="Exception"></exception>
     public static void RemoveNode(Node _NodeToRemove)
     {
         Stack<Node> removeStack = new Stack<Node>();
@@ -122,11 +134,10 @@ public class Remover
             {
                 parent.UpdateRect();
 
-                if (parent.EncapsulatingNode.Parent != null) 
+                if (parent.EncapsulatingNode.Parent != null)
                 {
                     parent.EncapsulatingNode.Parent.Entry.UpdateRect();
                 }
-                
 
                 if (parent.EncapsulatingNode.IsUnderflowing())
                 {

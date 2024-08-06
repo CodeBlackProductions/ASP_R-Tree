@@ -3,8 +3,16 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Rebalances the content of nodes when they are over- or underflowing.
+/// </summary>
 public class NodeRebalancer
 {
+    /// <summary>
+    /// Rebalances targeted overflowing node.
+    /// </summary>
+    /// <param name="_TargetNode">Node to rebalance</param>
+    /// <exception cref="ArgumentNullException"></exception>
     public static void RebalanceOverflowNodes(Node _TargetNode)
     {
         if (_TargetNode == null)
@@ -103,6 +111,11 @@ public class NodeRebalancer
         }
     }
 
+    /// <summary>
+    /// Rebalances targeted underflowing node.
+    /// </summary>
+    /// <param name="_TargetNode">Node to rebalance</param>
+    /// <exception cref="ArgumentNullException"></exception>
     public static void RebalanceUnderflowNodes(Node _TargetNode)
     {
         if (_TargetNode == null)
@@ -213,6 +226,12 @@ public class NodeRebalancer
         }
     }
 
+    /// <summary>
+    /// Redistributes entries from the partner node to the underflowing target node.
+    /// </summary>
+    /// <param name="_TargetLeaf">Node that is underflowing</param>
+    /// <param name="_PartnerLeaf">Node that has enough entries to balance out target node without underflowing itself</param>
+    /// <param name="_AmountToRedistribute">Amount of objects to redistribute</param>
     private static void RedistributeUnderflowEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
     {
         LeafData[] newTargetData = new LeafData[_TargetLeaf.EntryCount + _AmountToRedistribute];
@@ -234,6 +253,12 @@ public class NodeRebalancer
         _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
+    /// <summary>
+    /// Redistributes entries from the partner node to the underflowing target node.
+    /// </summary>
+    /// <param name="_TargetBranch">Node that is underflowing</param>
+    /// <param name="_PartnerBranch">Node that has enough entries to balance out target node without underflowing itself</param>
+    /// <param name="_AmountToRedistribute">Amount of objects to redistribute</param>
     private static void RedistributeUnderflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
     {
         Node[] newTargetData = new Node[_TargetBranch.EntryCount + _AmountToRedistribute];
@@ -268,6 +293,12 @@ public class NodeRebalancer
         _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
+    /// <summary>
+    /// Redistributes entries from the overflowing target node to the partner node.
+    /// </summary>
+    /// <param name="_TargetLeaf">Node that is overflowing</param>
+    /// <param name="_PartnerLeaf">Node that has enough space to balance out target node without overflowing itself</param>
+    /// <param name="_AmountToRedistribute">Amount of objects to redistribute</param>
     private static void RedistributeOverflowEntries(Leaf _TargetLeaf, Leaf _PartnerLeaf, int _AmountToRedistribute)
     {
         LeafData[] newTargetData = new LeafData[_TargetLeaf.EntryCount - _AmountToRedistribute];
@@ -289,6 +320,12 @@ public class NodeRebalancer
         _TargetLeaf.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
+    /// <summary>
+    /// Redistributes entries from the overflowing target node to the partner node.
+    /// </summary>
+    /// <param name="_TargetBranch">Node that is overflowing</param>
+    /// <param name="_PartnerBranch">Node that has enough space to balance out target node without overflowing itself</param>
+    /// <param name="_AmountToRedistribute">Amount of objects to redistribute</param>
     private static void RedistributeOverflowEntries(Branch _TargetBranch, Branch _PartnerBranch, int _AmountToRedistribute)
     {
         Node[] newTargetData = new Node[_TargetBranch.EntryCount - _AmountToRedistribute];
@@ -323,6 +360,11 @@ public class NodeRebalancer
         _TargetBranch.EncapsulatingNode.Parent.Entry.UpdateRect();
     }
 
+    /// <summary>
+    /// Merges two nodes into one.
+    /// </summary>
+    /// <param name="_TargetLeaf">Node that is underflowing</param>
+    /// <param name="_PartnerLeaf">Node that is close to underflowing</param>
     private static void MergeNode(Leaf _TargetLeaf, Leaf _PartnerLeaf)
     {
         LeafData[] mergedData = new LeafData[_TargetLeaf.EntryCount + _PartnerLeaf.EntryCount];
@@ -339,6 +381,11 @@ public class NodeRebalancer
         Remover.RemoveNode(_PartnerLeaf.EncapsulatingNode);
     }
 
+    /// <summary>
+    /// Merges two nodes into one.
+    /// </summary>
+    /// <param name="_TargetBranch">Node that is underflowing</param>
+    /// <param name="_PartnerBranch">Node that is close to underflowing</param>
     private static void MergeNode(Branch _TargetBranch, Branch _PartnerBranch)
     {
         Node[] mergedData = new Node[_TargetBranch.EntryCount + _PartnerBranch.EntryCount];
@@ -361,6 +408,13 @@ public class NodeRebalancer
         Remover.RemoveNode(_PartnerBranch.EncapsulatingNode);
     }
 
+    /// <summary>
+    /// Compares proximity between two objects and a position. Used for distance based sorting.
+    /// </summary>
+    /// <param name="_TargetCenter">The position to compare to</param>
+    /// <param name="_A">Object A</param>
+    /// <param name="_B">Object B</param>
+    /// <returns>Returns an integer that determines if A or B is closer to the target point</returns>
     private static int CompareProximity(Vector3 _TargetCenter, LeafData _A, LeafData _B)
     {
         float distanceA = Vector3.DistanceSquared(_TargetCenter, new Vector3(_A.PosX, _A.PosY, _A.PosZ));
@@ -380,6 +434,13 @@ public class NodeRebalancer
         }
     }
 
+    /// <summary>
+    /// Compares proximity between two Nodes and a position. Used for distance based sorting.
+    /// </summary>
+    /// <param name="_TargetCenter">The position to compare to</param>
+    /// <param name="_A">Node A</param>
+    /// <param name="_B">Node B</param>
+    /// <returns>Returns an integer that determines if A or B is closer to the target point</returns>
     private static int CompareProximity(Vector3 _TargetCenter, Node _A, Node _B)
     {
         float distanceA = Vector3.DistanceSquared(_TargetCenter, _A.Entry.Rect.GetCenter());

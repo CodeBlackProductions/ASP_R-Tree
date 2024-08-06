@@ -1,12 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Numerics;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Searches for leaf nodes within the specified area. Gets the closest one if no intersecting nodes are found.
+/// </summary>
 public class LeafSearch
 {
+    /// <summary>
+    /// Searches for leaf nodes within the specified area. Gets the closest one found.
+    /// If no intersecting nodes are found returns the closest non intersecting node.
+    /// </summary>
+    /// <param name="_Root">The root node of the tree.</param>
+    /// <param name="_Range">The area to search for leaf nodes</param>
+    /// <param name="_Result">The closest leaf node found within the specified area or around</param>
     public void StartSearch(Node _Root, Rect _Range, out Leaf _Result)
     {
         IEnumerable<Node> nodes;
@@ -58,6 +67,13 @@ public class LeafSearch
         }
     }
 
+    /// <summary>
+    /// Searches for leaf nodes within the specified area, containing a certain object.
+    /// </summary>
+    /// <param name="_Root">The root node of the tree.</param>
+    /// <param name="_EntryIndex">The index of the object that has to be contained</param>
+    /// <param name="_Range">The area to search for leaf nodes</param>
+    /// <param name="_Result">The leaf nodes found within the specified area</param>
     public void StartSearch(Node _Root, int _EntryIndex, Rect _Range, out Leaf _Result)
     {
         IEnumerable<Node> nodes;
@@ -110,6 +126,13 @@ public class LeafSearch
         _Result = null;
     }
 
+    /// <summary>
+    /// Used for recursively scanning the entire tree.
+    /// </summary>
+    /// <param name="_Range">The area to search for leaf nodes</param>
+    /// <param name="_Start">The node to start searching from</param>
+    /// <param name="_Intersecting">Wether this method should check for intersecting nodes only</param>
+    /// <returns>The leaf nodes found within the specified area</returns>
     private List<Leaf> ScanRange(Rect _Range, Node _Start, bool _Intersecting)
     {
         List<Leaf> resultData = new List<Leaf>();
@@ -153,6 +176,14 @@ public class LeafSearch
         return resultData;
     }
 
+    /// <summary>
+    /// Used for recursively scanning the entire tree.
+    /// </summary>
+    /// <param name="_Range">The area to search for leaf nodes</param>
+    /// <param name="_Start">The node to start searching from</param>
+    /// <param name="_Intersecting">Wether this method should check for intersecting nodes only</param>
+    /// <param name="_EntryIndex">The index of the object that has to be contained</param>
+    /// <returns>The leaf nodes found within the specified area</returns>
     private List<Leaf> ScanRange(Rect _Range, Node _Start, bool _Intersecting, int _EntryIndex)
     {
         List<Leaf> resultData = new List<Leaf>();
