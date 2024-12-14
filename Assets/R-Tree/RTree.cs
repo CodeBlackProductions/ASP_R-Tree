@@ -19,7 +19,6 @@ public class RTree
 
     public RTree(int _NodeCapacity, int nodeMinCapacity)
     {
-        
         m_NodeCapacity = _NodeCapacity;
         m_GameObjects = new Dictionary<int, UnityEngine.GameObject>();
         m_Indices = new Dictionary<UnityEngine.GameObject, int>();
@@ -43,10 +42,9 @@ public class RTree
     {
         m_GameObjects.Add(m_IndexCounter, _Obj);
         m_Indices.Add(_Obj, m_IndexCounter);
-        m_IndexCounter++;
 
         Vector3 pos = new Vector3(_Obj.transform.position.x, _Obj.transform.position.y, _Obj.transform.position.z);
-        m_TreePositions.Add(_Obj,pos);
+        m_TreePositions.Add(_Obj, pos);
 
         if (m_Root.Entry == null)
         {
@@ -60,6 +58,8 @@ public class RTree
         }
 
         Inserter.InsertData(m_Root, m_IndexCounter, pos.X, pos.Y, pos.Z);
+
+        m_IndexCounter++;
     }
 
     /// <summary>
@@ -88,7 +88,6 @@ public class RTree
     {
         if (m_GameObjects[_Idx])
         {
-
             Remover.RemoveEntry(m_Root, _Idx, m_TreePositions[m_GameObjects[_Idx]]);
 
             m_TreePositions.Remove(m_GameObjects[_Idx]);
@@ -101,7 +100,7 @@ public class RTree
     /// Updates the objects position inside the R-Tree.
     /// </summary>
     /// <param name="_Obj">The object you want to update.</param>
-    public void UpdateObjectPosition(UnityEngine.GameObject _Obj) 
+    public void UpdateObjectPosition(UnityEngine.GameObject _Obj)
     {
         Remove(_Obj);
         Insert(_Obj);
@@ -115,14 +114,17 @@ public class RTree
     public UnityEngine.GameObject[] FindRange(Rect _Range)
     {
         LeafData[] searchData = TreeScanner.SearchLeafData(m_Root, _Range);
-        UnityEngine.GameObject[] result = new UnityEngine.GameObject[searchData.Length];
-        for (int i = 0; i < searchData.Length; i++)
-        {
-            result[i]= m_GameObjects[searchData[i].ObjIDX];
-        }
 
-       
-        return result;
+        if (searchData != null && searchData.Length > 0)
+        {
+            UnityEngine.GameObject[] result = new UnityEngine.GameObject[searchData.Length];
+            for (int i = 0; i < searchData.Length; i++)
+            {
+                result[i] = m_GameObjects[searchData[i].ObjIDX];
+            }
+            return result;
+        }
+        return null;
     }
 
     #endregion External Access

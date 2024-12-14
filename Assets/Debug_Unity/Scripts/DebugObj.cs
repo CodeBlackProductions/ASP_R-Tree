@@ -27,6 +27,10 @@ public class DebugObj : MonoBehaviour
         {
             tree.UpdateObjectPosition(gameObject);
             UpdatePos();
+            System.Numerics.Vector3 LL = new System.Numerics.Vector3(transform.position.x - 10, transform.position.y - 10, transform.position.z - 10);
+            System.Numerics.Vector3 UR = new System.Numerics.Vector3(transform.position.x + 10, transform.position.y + 10, transform.position.z + 10);
+            Rect range = new Rect(LL, UR);
+            tree.FindRange(range);
         }
     }
 
